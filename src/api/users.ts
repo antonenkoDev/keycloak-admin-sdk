@@ -1,24 +1,35 @@
 // src/api/users.ts
 
 import KeycloakAdminSDK  from '../index';
-import { User, CreateUserInput, UpdateUserInput } from '../types';
+import {GetUserParams, GetUsersParams, UserRepresentation} from "../types/users";
 
 export class UsersApi {
     constructor(private sdk: KeycloakAdminSDK) {}
 
-    async list(): Promise<User[]> {
-        return this.sdk.request<User[]>('/users', 'GET');
+    async list(params?: GetUsersParams): Promise<UserRepresentation[]> {
+        const query = new URLSearchParams(params as any).toString();
+        const endpoint = `/users${query ? `?${query}` : ''}`;
+        return this.sdk.request<UserRepresentation[]>(endpoint, 'GET');
     }
 
-    async create(input: CreateUserInput): Promise<User> {
-        return this.sdk.request<User>('/users', 'POST', input);
+    async create(user: UserRepresentation): Promise<UserRepresentation> {
+        const endpoint = `/users`;
+        return this.sdk.request<UserRepresentation>(endpoint, 'POST', user);
     }
 
-    async update(userId: string, input: UpdateUserInput): Promise<User> {
-        return this.sdk.request<User>(`/users/${userId}`, 'PUT', input);
+    async get(userId: string, params?: GetUserParams): Promise<UserRepresentation> {
+        const query = new URLSearchParams(params as any).toString();
+        const endpoint = `/users/${userId}${query ? `?${query}` : ''}`;
+        return this.sdk.request<UserRepresentation>(endpoint, 'GET');
+    }
+
+    async update(userId: string, user: UserRepresentation): Promise<void> {
+        const endpoint = `/users/${userId}`;
+        await this.sdk.request<void>(endpoint, 'PUT', user);
     }
 
     async delete(userId: string): Promise<void> {
-        return this.sdk.request<void>(`/users/${userId}`, 'DELETE');
+        const endpoint = `/users/${userId}`;
+        await this.sdk.request<void>(endpoint, 'DELETE');
     }
 }

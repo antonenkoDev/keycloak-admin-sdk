@@ -1,4 +1,4 @@
-// src/index.ts
+// src/users.ts
 
 import { UsersApi } from './api/users';
 import { KeycloakConfig } from './types/auth';
