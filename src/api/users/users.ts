@@ -6,7 +6,7 @@ import {
     CountUsersParams,
     UPConfig,
     UserProfileMetadata,
-    SendVerifyEmailParams, ExecuteActionsEmailParams, UserSessionRepresentation
+    SendVerifyEmailParams, ExecuteActionsEmailParams, UserSessionRepresentation, FederatedIdentityRepresentation
 } from '../../types/users/users';
 import {ConsentsApi} from "./consents";
 
@@ -166,5 +166,40 @@ export class UsersApi {
     async getUserSessions(userId: string): Promise<UserSessionRepresentation[]> {
         const endpoint = `/users/${userId}/sessions`;
         return this.sdk.request<UserSessionRepresentation[]>(endpoint, 'GET');
+    }
+
+    /**
+     * Get social logins associated with the user.
+     *
+     * @param {string} userId - The ID of the user.
+     * @returns {Promise<FederatedIdentityRepresentation[]>} A list of federated identities.
+     */
+    async getFederatedIdentities(userId: string): Promise<FederatedIdentityRepresentation[]> {
+        const endpoint = `/users/${userId}/federated-identity`;
+        return this.sdk.request<FederatedIdentityRepresentation[]>(endpoint, 'GET');
+    }
+
+    /**
+     * Add a social login provider to the user.
+     *
+     * @param {string} userId - The ID of the user.
+     * @param {string} provider - The ID of the social login provider.
+     * @returns {Promise<void>}
+     */
+    async addFederatedIdentity(userId: string, provider: string): Promise<void> {
+        const endpoint = `/users/${userId}/federated-identity/${provider}`;
+        await this.sdk.request<void>(endpoint, 'POST');
+    }
+
+    /**
+     * Remove a social login provider from the user.
+     *
+     * @param {string} userId - The ID of the user.
+     * @param {string} provider - The ID of the social login provider.
+     * @returns {Promise<void>}
+     */
+    async removeFederatedIdentity(userId: string, provider: string): Promise<void> {
+        const endpoint = `/users/${userId}/federated-identity/${provider}`;
+        await this.sdk.request<void>(endpoint, 'DELETE');
     }
 }

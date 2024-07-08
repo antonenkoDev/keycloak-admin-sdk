@@ -135,3 +135,9 @@ export interface UserSessionRepresentation {
     clients?: Record<string, any>;
     applications?: Record<string, any>;
 }
+
+export interface FederatedIdentityRepresentation {
+    identityProvider?: string;
+    userId?: string;
+    userName?: string;
+}

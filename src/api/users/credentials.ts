@@ -76,4 +76,16 @@ export class CredentialsApi {
         const endpoint = `/users/${userId}/disable-credential-types`;
         await this.sdk.request<void>(endpoint, 'PUT', types);
     }
+
+    /**
+     * Reset password for a user.
+     *
+     * @param {string} userId - The ID of the user.
+     * @param {CredentialRepresentation} credential - The new credential representation.
+     * @returns {Promise<void>}
+     */
+    async resetPassword(userId: string, credential: CredentialRepresentation): Promise<void> {
+        const endpoint = `/users/${userId}/reset-password`;
+        await this.sdk.request<void>(endpoint, 'PUT', credential);
+    }
 }
