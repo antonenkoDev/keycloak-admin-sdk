@@ -1,6 +1,6 @@
 import {KeycloakConfig} from "../../../src/types/auth";
 import KeycloakAdminSDK from "../../../src";
-import {UserProfileMetadata} from "../../../src/types/users/users";
+import {UserProfileMetadata} from "../../../src/types/users";
 
 const config: KeycloakConfig = {
     baseUrl: 'http://localhost:8080',

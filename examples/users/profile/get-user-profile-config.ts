@@ -1,5 +1,5 @@
 import {KeycloakConfig} from "../../../src/types/auth";
-import {UPConfig} from "../../../src/types/users/users";
+import {UPConfig} from "../../../src/types/users";
 import KeycloakAdminSDK from "../../../src";
 
 // Configuration for Keycloak SDK

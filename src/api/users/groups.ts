@@ -1,5 +1,5 @@
 import KeycloakAdminSDK from "../../index";
-import {GroupRepresentation} from "../../types/users/users";
+import {GroupRepresentation} from "../../types/users";
 
 export class GroupsApi {
     constructor(private sdk: KeycloakAdminSDK) {}

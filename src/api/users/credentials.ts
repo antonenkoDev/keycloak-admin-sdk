@@ -1,5 +1,5 @@
 import KeycloakAdminSDK from "../../index";
-import {CredentialRepresentation} from "../../types/users/users";
+import {CredentialRepresentation} from "../../types/users";
 
 export class CredentialsApi {
     constructor(private sdk: KeycloakAdminSDK) {}

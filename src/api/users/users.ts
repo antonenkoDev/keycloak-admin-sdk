@@ -7,7 +7,7 @@ import {
     UPConfig,
     UserProfileMetadata,
     SendVerifyEmailParams, ExecuteActionsEmailParams, UserSessionRepresentation, FederatedIdentityRepresentation
-} from '../../types/users/users';
+} from '../../types/users';
 import {ConsentsApi} from "./consents";
 import {CredentialsApi} from "./credentials";
 import {GroupsApi} from "./groups";

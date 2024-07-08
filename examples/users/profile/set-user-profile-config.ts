@@ -3,7 +3,7 @@
 // Configuration for Keycloak SDK
 import {KeycloakConfig} from "../../../src/types/auth";
 import KeycloakAdminSDK from "../../../src";
-import {UPConfig} from "../../../src/types/users/users";
+import {UPConfig} from "../../../src/types/users";
 
 const config: KeycloakConfig = {
     baseUrl: 'http://localhost:8080',
