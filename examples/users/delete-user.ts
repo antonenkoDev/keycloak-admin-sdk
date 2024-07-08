@@ -1,6 +1,5 @@
-import KeycloakAdminSDK from '../src/index';
-import {KeycloakConfig} from "../src/types/auth";
-import {UserRepresentation} from "../src/types/users";
+import KeycloakAdminSDK from '../../src';
+import {KeycloakConfig} from "../../src/types/auth";
 
 // Configuration for Keycloak SDK
 const config: KeycloakConfig = {
@@ -19,10 +18,10 @@ const sdk = new KeycloakAdminSDK(config);
 (async () => {
     try {
         const userId = 'some-user-id';
-        // Get user representation
-        const user: UserRepresentation = await sdk.users.get(userId, { userProfileMetadata: true });
-        console.log(user);
+        // Delete user
+        await sdk.users.delete(userId);
+        console.log('User deleted successfully');
     } catch (error) {
-        console.error('Error fetching user:', error);
+        console.error('Error deleting user:', error);
     }
 })();

@@ -1,5 +1,5 @@
-import KeycloakAdminSDK from '../src/index';
-import {KeycloakConfig} from "../src/types/auth";
+import KeycloakAdminSDK from '../../src';
+import {KeycloakConfig} from "../../src/types/auth";
 
 // Configuration for Keycloak SDK
 const config: KeycloakConfig = {
@@ -17,11 +17,10 @@ const sdk = new KeycloakAdminSDK(config);
 
 (async () => {
     try {
-        const userId = 'some-user-id';
-        // Delete user
-        await sdk.users.delete(userId);
-        console.log('User deleted successfully');
+        // Get user count with optional filters
+        const userCount = await sdk.users.count({ enabled: true, emailVerified: true });
+        console.log('User count:', userCount);
     } catch (error) {
-        console.error('Error deleting user:', error);
+        console.error('Error fetching user count:', error);
     }
 })();

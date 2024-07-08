@@ -94,3 +94,13 @@ export interface GetUsersParams {
 export interface GetUserParams {
     userProfileMetadata?: boolean;
 }
+export interface CountUsersParams {
+    email?: string;
+    emailVerified?: boolean;
+    enabled?: boolean;
+    firstName?: string;
+    lastName?: string;
+    q?: string;
+    search?: string;
+    username?: string;
+}

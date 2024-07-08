@@ -1,6 +1,6 @@
-import KeycloakAdminSDK from '../src/index';
-import {KeycloakConfig} from "../src/types/auth";
-import {UserRepresentation} from "../src/types/users";
+import KeycloakAdminSDK from '../../src';
+import {KeycloakConfig} from "../../src/types/auth";
+import {UserRepresentation} from "../../src/types/users";
 
 // Configuration for Keycloak SDK
 const config: KeycloakConfig = {

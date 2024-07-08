@@ -1,6 +1,6 @@
-import {UserRepresentation} from "../src/types/users";
-import {KeycloakConfig} from "../src/types/auth";
-import KeycloakAdminSDK from "../src";
+import {UserRepresentation} from "../../src/types/users";
+import {KeycloakConfig} from "../../src/types/auth";
+import KeycloakAdminSDK from "../../src";
 
 const config: KeycloakConfig = {
     baseUrl: 'http://localhost:8080',

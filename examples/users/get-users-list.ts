@@ -1,5 +1,5 @@
-import {KeycloakConfig} from "../src/types/auth";
-import KeycloakAdminSDK from "../src";
+import {KeycloakConfig} from "../../src/types/auth";
+import KeycloakAdminSDK from "../../src";
 
 const config: KeycloakConfig = {
     baseUrl: 'http://localhost:8080',

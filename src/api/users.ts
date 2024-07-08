@@ -1,7 +1,7 @@
 // src/api/users.ts
 
 import KeycloakAdminSDK  from '../index';
-import {GetUserParams, GetUsersParams, UserRepresentation} from "../types/users";
+import {CountUsersParams, GetUserParams, GetUsersParams, UserRepresentation} from "../types/users";
 
 export class UsersApi {
     constructor(private sdk: KeycloakAdminSDK) {}
@@ -31,5 +31,11 @@ export class UsersApi {
     async delete(userId: string): Promise<void> {
         const endpoint = `/users/${userId}`;
         await this.sdk.request<void>(endpoint, 'DELETE');
+    }
+
+    async count(params?: CountUsersParams): Promise<number> {
+        const query = new URLSearchParams(params as any).toString();
+        const endpoint = `/users/count${query ? `?${query}` : ''}`;
+        return this.sdk.request<number>(endpoint, 'GET');
     }
 }
