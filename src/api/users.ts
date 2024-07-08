@@ -60,4 +60,9 @@ export class UsersApi {
         const endpoint = `/users/profile/metadata`;
         return this.sdk.request<UserProfileMetadata>(endpoint, 'GET');
     }
+
+    async getUserStorageCredentialTypes(userId: string): Promise<string[]> {
+        const endpoint = `/users/${userId}/configured-user-storage-credential-types`;
+        return this.sdk.request<string[]>(endpoint, 'GET');
+    }
 }
