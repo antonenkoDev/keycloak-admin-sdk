@@ -1,0 +1,29 @@
+{
+  "name": "keycloak-admin-sdk",
+  "version": "1.0.0",
+  "description": "Node.js SDK for Keycloak Admin API",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "prepare": "npm run build"
+  },
+  "keywords": [
+    "keycloak",
+    "admin",
+    "sdk",
+    "api"
+  ],
+  "author": "Ваше имя",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "node-fetch": "^3.3.0"
+  },
+  "devDependencies": {
+    "@types/node-fetch": "^2.6.11"
+  }
+}
