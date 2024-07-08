@@ -208,4 +208,38 @@ export class UsersApi {
         const endpoint = `/users/${userId}/federated-identity/${provider}`;
         await this.sdk.request<void>(endpoint, 'DELETE');
     }
+
+    /**
+     * Impersonate the user.
+     *
+     * @param {string} userId - The ID of the user.
+     * @returns {Promise<any>} The impersonation response.
+     */
+    async impersonate(userId: string): Promise<any> {
+        const endpoint = `/users/${userId}/impersonation`;
+        return this.sdk.request<any>(endpoint, 'POST');
+    }
+
+    /**
+     * Remove all user sessions associated with the user.
+     *
+     * @param {string} userId - The ID of the user.
+     * @returns {Promise<void>}
+     */
+    async logout(userId: string): Promise<void> {
+        const endpoint = `/users/${userId}/logout`;
+        await this.sdk.request<void>(endpoint, 'POST');
+    }
+
+    /**
+     * Get offline sessions associated with the user and client.
+     *
+     * @param {string} userId - The ID of the user.
+     * @param {string} clientUuid - The UUID of the client.
+     * @returns {Promise<UserSessionRepresentation[]>} A list of user sessions.
+     */
+    async getOfflineSessions(userId: string, clientUuid: string): Promise<UserSessionRepresentation[]> {
+        const endpoint = `/users/${userId}/offline-sessions/${clientUuid}`;
+        return this.sdk.request<UserSessionRepresentation[]>(endpoint, 'GET');
+    }
 }
