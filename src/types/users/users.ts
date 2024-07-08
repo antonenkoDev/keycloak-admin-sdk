@@ -113,3 +113,25 @@ export interface UPConfig {
 export interface ConsentRepresentation {
     [key: string]: any;
 }
+
+export interface ExecuteActionsEmailParams {
+    client_id?: string;
+    lifespan?: number;
+    redirect_uri?: string;
+}
+
+export interface SendVerifyEmailParams {
+    client_id?: string;
+    lifespan?: number;
+    redirect_uri?: string;
+}
+
+export interface UserSessionRepresentation {
+    id?: string;
+    userId?: string;
+    ipAddress?: string;
+    start?: number;
+    lastAccess?: number;
+    clients?: Record<string, any>;
+    applications?: Record<string, any>;
+}

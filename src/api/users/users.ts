@@ -1,5 +1,13 @@
 import KeycloakAdminSDK from '../../index';
-import { UserRepresentation, GetUsersParams, GetUserParams, CountUsersParams, UPConfig, UserProfileMetadata } from '../../types/users/users';
+import {
+    UserRepresentation,
+    GetUsersParams,
+    GetUserParams,
+    CountUsersParams,
+    UPConfig,
+    UserProfileMetadata,
+    SendVerifyEmailParams, ExecuteActionsEmailParams, UserSessionRepresentation
+} from '../../types/users/users';
 import {ConsentsApi} from "./consents";
 
 export class UsersApi {
@@ -120,5 +128,43 @@ export class UsersApi {
     async getUserStorageCredentialTypes(userId: string): Promise<string[]> {
         const endpoint = `/users/${userId}/configured-user-storage-credential-types`;
         return this.sdk.request<string[]>(endpoint, 'GET');
+    }
+
+    /**
+     * Send an email to the user with a link they can click to execute particular actions.
+     *
+     * @param {string} userId - The ID of the user.
+     * @param {string[]} actions - The actions the user can execute.
+     * @param {ExecuteActionsEmailParams} [params] - Optional parameters for the request.
+     * @returns {Promise<void>}
+     */
+    async executeActionsEmail(userId: string, actions: string[], params?: ExecuteActionsEmailParams): Promise<void> {
+        const query = new URLSearchParams(params as any).toString();
+        const endpoint = `/users/${userId}/execute-actions-email${query ? `?${query}` : ''}`;
+        await this.sdk.request<void>(endpoint, 'PUT', actions);
+    }
+
+    /**
+     * Send an email-verification email to the user.
+     *
+     * @param {string} userId - The ID of the user.
+     * @param {SendVerifyEmailParams} [params] - Optional parameters for the request.
+     * @returns {Promise<void>}
+     */
+    async sendVerifyEmail(userId: string, params?: SendVerifyEmailParams): Promise<void> {
+        const query = new URLSearchParams(params as any).toString();
+        const endpoint = `/users/${userId}/send-verify-email${query ? `?${query}` : ''}`;
+        await this.sdk.request<void>(endpoint, 'PUT');
+    }
+
+    /**
+     * Get sessions associated with the user.
+     *
+     * @param {string} userId - The ID of the user.
+     * @returns {Promise<UserSessionRepresentation[]>} A list of user sessions.
+     */
+    async getUserSessions(userId: string): Promise<UserSessionRepresentation[]> {
+        const endpoint = `/users/${userId}/sessions`;
+        return this.sdk.request<UserSessionRepresentation[]>(endpoint, 'GET');
     }
 }
