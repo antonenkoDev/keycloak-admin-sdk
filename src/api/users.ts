@@ -1,7 +1,14 @@
 // src/api/users.ts
 
 import KeycloakAdminSDK  from '../index';
-import {CountUsersParams, GetUserParams, GetUsersParams, UserRepresentation} from "../types/users";
+import {
+    CountUsersParams,
+    GetUserParams,
+    GetUsersParams,
+    UPConfig,
+    UserProfileMetadata,
+    UserRepresentation
+} from "../types/users";
 
 export class UsersApi {
     constructor(private sdk: KeycloakAdminSDK) {}
@@ -37,5 +44,20 @@ export class UsersApi {
         const query = new URLSearchParams(params as any).toString();
         const endpoint = `/users/count${query ? `?${query}` : ''}`;
         return this.sdk.request<number>(endpoint, 'GET');
+    }
+
+    async getUserProfileConfig(): Promise<UPConfig> {
+        const endpoint = `/users/profile`;
+        return this.sdk.request<UPConfig>(endpoint, 'GET');
+    }
+
+    async setUserProfileConfig(config: UPConfig): Promise<UPConfig> {
+        const endpoint = `/users/profile`;
+        return this.sdk.request<UPConfig>(endpoint, 'PUT', config);
+    }
+
+    async getUserProfileMetadata(): Promise<UserProfileMetadata> {
+        const endpoint = `/users/profile/metadata`;
+        return this.sdk.request<UserProfileMetadata>(endpoint, 'GET');
     }
 }

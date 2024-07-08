@@ -104,3 +104,8 @@ export interface CountUsersParams {
     search?: string;
     username?: string;
 }
+
+export interface UPConfig {
+    attributes?: UserProfileAttribute[];
+    groups?: UserProfileGroup[];
+}
