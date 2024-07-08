@@ -9,12 +9,18 @@ import {
     SendVerifyEmailParams, ExecuteActionsEmailParams, UserSessionRepresentation, FederatedIdentityRepresentation
 } from '../../types/users/users';
 import {ConsentsApi} from "./consents";
+import {CredentialsApi} from "./credentials";
+import {GroupsApi} from "./groups";
 
 export class UsersApi {
     public consents: ConsentsApi;
+    public credentials: CredentialsApi;
+    public groups: GroupsApi;
 
     constructor(private sdk: KeycloakAdminSDK) {
         this.consents = new ConsentsApi(sdk);
+        this.credentials = new CredentialsApi(sdk);
+        this.groups = new GroupsApi(sdk);
     }
 
     /**

@@ -141,3 +141,12 @@ export interface FederatedIdentityRepresentation {
     userId?: string;
     userName?: string;
 }
+
+export interface GroupRepresentation {
+    id?: string;
+    name?: string;
+    path?: string;
+    subGroups?: GroupRepresentation[];
+    attributes?: Record<string, string[]>;
+    access?: Record<string, boolean>;
+}
