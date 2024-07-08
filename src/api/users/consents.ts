@@ -1,5 +1,5 @@
 import KeycloakAdminSDK from "../../index";
-import {ConsentRepresentation} from "../../types/users/consents";
+import {ConsentRepresentation} from "../../types/users/users";
 
 export class ConsentsApi {
     constructor(private sdk: KeycloakAdminSDK) {}

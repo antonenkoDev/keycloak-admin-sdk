@@ -109,3 +109,7 @@ export interface UPConfig {
     attributes?: UserProfileAttribute[];
     groups?: UserProfileGroup[];
 }
+
+export interface ConsentRepresentation {
+    [key: string]: any;
+}
