@@ -1,4 +1,4 @@
-import {UserRepresentation} from "../../src/types/users";
+import {UserRepresentation} from "../../src/types/users/users";
 import {KeycloakConfig} from "../../src/types/auth";
 import KeycloakAdminSDK from "../../src";
 

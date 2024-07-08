@@ -1,8 +1,13 @@
-import KeycloakAdminSDK from '../index';
-import { UserRepresentation, GetUsersParams, GetUserParams, CountUsersParams, UPConfig, UserProfileMetadata } from '../types/users';
+import KeycloakAdminSDK from '../../index';
+import { UserRepresentation, GetUsersParams, GetUserParams, CountUsersParams, UPConfig, UserProfileMetadata } from '../../types/users/users';
+import {ConsentsApi} from "./consents";
 
 export class UsersApi {
-    constructor(private sdk: KeycloakAdminSDK) {}
+    public consents: ConsentsApi;
+
+    constructor(private sdk: KeycloakAdminSDK) {
+        this.consents = new ConsentsApi(sdk);
+    }
 
     /**
      * Get a list of users.

@@ -1,6 +1,6 @@
 // src/users.ts
 
-import { UsersApi } from './api/users';
+import { UsersApi } from './api/users/users';
 import { KeycloakConfig } from './types/auth';
 import { getToken } from './utils/auth';
 import {HttpMethod, makeRequest} from "./utils/request";
