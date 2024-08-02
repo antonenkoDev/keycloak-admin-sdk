@@ -4,17 +4,20 @@ import { UsersApi } from './api/users/users';
 import { KeycloakConfig } from './types/auth';
 import { getToken } from './utils/auth';
 import {HttpMethod, makeRequest} from "./utils/request";
+import {GroupsApi} from "./api/grops/groups";
 
 class KeycloakAdminSDK {
     private baseUrl: string;
     private config: KeycloakConfig;
     private token: string | null = null;
     public users: UsersApi;
+    public groupsManage: GroupsApi;
 
     constructor(config: KeycloakConfig) {
         this.config = config;
         this.baseUrl = `${config.baseUrl}/admin/realms/${config.realm}`;
         this.users = new UsersApi(this);
+        this.groupsManage = new GroupsApi(this);
     }
 
     async getValidToken(): Promise<string> {
@@ -30,6 +33,7 @@ class KeycloakAdminSDK {
         const token = await this.getValidToken();
         return makeRequest<T>(`${this.baseUrl}${endpoint}`, method, token, body);
     }
+
 }
 
 export default KeycloakAdminSDK;
