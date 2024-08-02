@@ -2,10 +2,7 @@ import KeycloakAdminSDK from "../../index";
 import {GetGroupsParams, GroupRepresentation} from "../../types/groups";
 
 export class GroupsApi{
-    public groups: GroupsApi;
-    constructor(private keycloakAdminSDK: KeycloakAdminSDK){
-        this.groups = new GroupsApi(keycloakAdminSDK);
-    }
+    constructor(private keycloakAdminSDK: KeycloakAdminSDK){}
     async list(params?: GetGroupsParams): Promise<GroupRepresentation[]>{
         const query = new URLSearchParams(params as any).toString();
         const endpoint = `/groups${query ? `?${query}` : ''}`;
