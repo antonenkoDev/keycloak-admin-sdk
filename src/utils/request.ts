@@ -63,7 +63,7 @@ export async function makeRequest<T>(
                     console.log(`Extracted ID from location header: ${id}`);
                     // Only return ID as an object for create operations where we expect an ID
                     // This is determined by checking if the method is POST and the URL ends with a collection endpoint
-                    if (method === 'POST' && (/\/(users|groups|clients|roles|client-scopes)$/.test(url))) {
+                    if (method === 'POST' && (/\/(users|groups|clients|roles|client-scopes|organizations)$/.test(url))) {
                         return { id } as T;
                     }
                 }
