@@ -12,6 +12,7 @@ import { ClientRoleMappingsApi } from './api/client-role-mappings/client-role-ma
 import { OrganizationsApi } from './api/organizations/organizations';
 import { RolesApi } from './api/roles/roles';
 import { RoleMappingsApiFactory } from './api/role-mappings';
+import { ScopeMappingsApiFactory } from './api/scope-mappings';
 import { KeycloakConfig } from './types/auth';
 import { getToken } from './utils/auth';
 import { HttpMethod, makeRequest } from "./utils/request";
@@ -35,6 +36,7 @@ class KeycloakAdminSDK {
     public organizations: OrganizationsApi;
     public roles: RolesApi;
     public roleMappings: RoleMappingsApiFactory;
+    public scopeMappings: ScopeMappingsApiFactory;
 
     /**
      * Creates a new instance of the Keycloak Admin SDK
@@ -56,6 +58,7 @@ class KeycloakAdminSDK {
         this.organizations = new OrganizationsApi(this);
         this.roles = new RolesApi(this);
         this.roleMappings = new RoleMappingsApiFactory(this);
+        this.scopeMappings = new ScopeMappingsApiFactory(this);
     }
 
     /**
@@ -86,15 +89,29 @@ class KeycloakAdminSDK {
      * @param {string} endpoint - The API endpoint to call
      * @param {HttpMethod} method - The HTTP method to use
      * @param {any} [body] - Optional request body
+     * @param {Record<string, any>} [queryParams] - Optional query parameters
      * @returns {Promise<T>} The response data
      */
-    async request<T>(endpoint: string, method: HttpMethod, body?: any): Promise<T> {
+    async request<T>(endpoint: string, method: HttpMethod, body?: any, queryParams?: Record<string, any>): Promise<T> {
         try {
             console.log(`Making ${method} request to realm endpoint: ${endpoint}`);
             const token = await this.getValidToken();
-            const url = `${this.baseUrl}${endpoint}`;
-            console.log(`Full URL: ${url}`);
-            return makeRequest<T>(url, method, token, body);
+            
+            // Add query parameters if provided
+            let fullUrl = `${this.baseUrl}${endpoint}`;
+            if (queryParams && Object.keys(queryParams).length > 0) {
+                const queryString = Object.entries(queryParams)
+                    .filter(([_, value]) => value !== undefined)
+                    .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(String(value))}`)
+                    .join('&');
+                    
+                if (queryString) {
+                    fullUrl += `?${queryString}`;
+                }
+            }
+            
+            console.log(`Full URL: ${fullUrl}`);
+            return makeRequest<T>(fullUrl, method, token, body);
         } catch (error) {
             console.error(`Request failed for endpoint ${endpoint}:`, error);
             throw error;

@@ -10,7 +10,7 @@ import KeycloakAdminSDK from '../../index';
 import { RoleRepresentation, RoleQuery } from '../../types/roles';
 import { GroupRepresentation } from '../../types/groups';
 import { UserRepresentation } from '../../types/users';
-import { ManagementPermissionReference } from '../../types/permissions';
+import { ManagementPermissionReference } from '../../types/groups';
 import { RolesByIdApi } from './roles-by-id';
 
 /**

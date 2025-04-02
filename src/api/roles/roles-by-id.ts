@@ -7,7 +7,7 @@
 
 import KeycloakAdminSDK from '../../index';
 import { RoleRepresentation } from '../../types/roles';
-import { ManagementPermissionReference } from '../../types/permissions';
+import { ManagementPermissionReference } from '../../types/groups';
 
 /**
  * Interface for querying role composites
