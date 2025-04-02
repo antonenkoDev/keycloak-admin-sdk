@@ -5,6 +5,7 @@
 
 import KeycloakAdminSDK from '../../index';
 import { ClientRepresentation, ClientScopeRepresentation, CredentialRepresentation, UserSessionRepresentation } from '../../types/clients';
+import { RoleRepresentation } from '../../types/roles';
 
 /**
  * API for managing Keycloak clients
@@ -397,6 +398,139 @@ export class ClientsApi {
             return this.sdk.request<Record<string, any>>('/clients/registration-access-token', 'POST', { clientId });
         } catch (error) {
             throw new Error(`Failed to get registration access token: ${error instanceof Error ? error.message : String(error)}`);
+        }
+    }
+
+    /**
+     * Get all roles for a client
+     * 
+     * Endpoint: GET /{realm}/clients/{id}/roles
+     * 
+     * @param {string} clientId - Client ID
+     * @returns {Promise<RoleRepresentation[]>} List of client roles
+     * @throws {Error} If the request fails
+     */
+    async listRoles(clientId: string): Promise<RoleRepresentation[]> {
+        if (!clientId) {
+            throw new Error('Client ID is required');
+        }
+        
+        try {
+            return this.sdk.request<RoleRepresentation[]>(`/clients/${clientId}/roles`, 'GET');
+        } catch (error) {
+            throw new Error(`Failed to list roles for client: ${error instanceof Error ? error.message : String(error)}`);
+        }
+    }
+
+    /**
+     * Get a role by name for a client
+     * 
+     * Endpoint: GET /{realm}/clients/{id}/roles/{role-name}
+     * 
+     * @param {string} clientId - Client ID
+     * @param {string} roleName - Role name
+     * @returns {Promise<RoleRepresentation>} Role representation
+     * @throws {Error} If the request fails
+     */
+    async getRole(clientId: string, roleName: string): Promise<RoleRepresentation> {
+        if (!clientId) {
+            throw new Error('Client ID is required');
+        }
+        if (!roleName) {
+            throw new Error('Role name is required');
+        }
+        
+        try {
+            return this.sdk.request<RoleRepresentation>(`/clients/${clientId}/roles/${roleName}`, 'GET');
+        } catch (error) {
+            throw new Error(`Failed to get role: ${error instanceof Error ? error.message : String(error)}`);
+        }
+    }
+
+    /**
+     * Create a new role for a client
+     * 
+     * Endpoint: POST /{realm}/clients/{id}/roles
+     * 
+     * @param {string} clientId - Client ID
+     * @param {RoleRepresentation} role - Role representation
+     * @returns {Promise<string>} ID of the created role
+     * @throws {Error} If the request fails
+     */
+    async createRole(clientId: string, role: RoleRepresentation): Promise<string> {
+        if (!clientId) {
+            throw new Error('Client ID is required');
+        }
+        if (!role) {
+            throw new Error('Role representation is required');
+        }
+        if (!role.name) {
+            throw new Error('Role name is required');
+        }
+        
+        try {
+            // Create the role
+            await this.sdk.request<void>(`/clients/${clientId}/roles`, 'POST', role);
+            
+            // Get the created role to return its ID
+            const createdRole = await this.getRole(clientId, role.name);
+            return createdRole.id || '';
+        } catch (error) {
+            throw new Error(`Failed to create role: ${error instanceof Error ? error.message : String(error)}`);
+        }
+    }
+
+    /**
+     * Update a role for a client
+     * 
+     * Endpoint: PUT /{realm}/clients/{id}/roles/{role-name}
+     * 
+     * @param {string} clientId - Client ID
+     * @param {string} roleName - Role name
+     * @param {RoleRepresentation} role - Updated role representation
+     * @returns {Promise<void>}
+     * @throws {Error} If the request fails
+     */
+    async updateRole(clientId: string, roleName: string, role: RoleRepresentation): Promise<void> {
+        if (!clientId) {
+            throw new Error('Client ID is required');
+        }
+        if (!roleName) {
+            throw new Error('Role name is required');
+        }
+        if (!role) {
+            throw new Error('Role representation is required');
+        }
+        
+        try {
+            await this.sdk.request<void>(`/clients/${clientId}/roles/${roleName}`, 'PUT', role);
+        } catch (error) {
+            throw new Error(`Failed to update role: ${error instanceof Error ? error.message : String(error)}`);
+        }
+    }
+
+    /**
+     * Delete a role from a client
+     * 
+     * Endpoint: DELETE /{realm}/clients/{id}/roles/{role-name}
+     * 
+     * @param {string} clientId - Client ID
+     * @param {string} roleName - Role name
+     * @returns {Promise<void>}
+     * @throws {Error} If the request fails
+     */
+    async deleteRole(clientId: string, roleName: string): Promise<void> {
+        if (!clientId) {
+            throw new Error('Client ID is required');
+        }
+        if (!roleName) {
+            throw new Error('Role name is required');
+        }
+        
+        try {
+            await this.sdk.request<void>(`/clients/${clientId}/roles/${roleName}`, 'DELETE');
+        } catch (error) {
+            throw new Error(`Failed to delete role: ${error instanceof Error ? error.message : String(error)}`);
         }
     }
 }

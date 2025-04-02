@@ -60,17 +60,40 @@ export class GroupsApi {
      * Endpoint: POST /admin/realms/{realm}/groups
      *
      * @param {GroupRepresentation} group - The group to create
-     * @returns {Promise<void>}
+     * @returns {Promise<string>} The ID of the created group
      * @throws {Error} If the request fails or group data is invalid
      */
-    async create(group: GroupRepresentation): Promise<void> {
+    async create(group: GroupRepresentation): Promise<string> {
         if (!group) {
             throw new Error('Group data is required');
         }
 
         try {
             const endpoint = `/groups`;
-            await this.sdk.request<void>(endpoint, 'POST', group);
+            
+            // Make the POST request to create the group
+            // Keycloak returns a 201 Created with a Location header containing the group ID
+            // Our enhanced request utility will extract the ID from the Location header
+            const result = await this.sdk.request<{id: string}>(endpoint, 'POST', group);
+            
+            if (result && result.id) {
+                console.log(`Created group with ID: ${result.id}`);
+                return result.id;
+            }
+            
+            // Fallback to finding the group by name if the ID wasn't extracted from the Location header
+            if (group.name) {
+                console.log('ID not found in response, falling back to finding group by name');
+                const groups = await this.list({ search: group.name });
+                const createdGroup = groups.find(g => g.name === group.name);
+                
+                if (createdGroup && createdGroup.id) {
+                    console.log(`Found group with ID: ${createdGroup.id}`);
+                    return createdGroup.id;
+                }
+            }
+            
+            throw new Error('Group was created but could not be found');
         } catch (error) {
             throw new Error(`Failed to create group: ${error instanceof Error ? error.message : String(error)}`);
         }

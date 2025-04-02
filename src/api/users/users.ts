@@ -72,10 +72,16 @@ export class UsersApi {
             
             // Make the POST request to create the user
             // Keycloak returns a 201 Created with a Location header containing the user ID
-            await this.sdk.request<void>(endpoint, 'POST', user);
+            // Our enhanced request utility will extract the ID from the Location header
+            const result = await this.sdk.request<{id: string}>(endpoint, 'POST', user);
             
-            // After creating the user, we need to find it by username to get the ID
-            console.log(`Finding created user by username: ${user.username}`);
+            if (result && result.id) {
+                console.log(`Created user with ID: ${result.id}`);
+                return result.id;
+            }
+            
+            // Fallback to the old method if the ID wasn't extracted from the Location header
+            console.log('ID not found in response, falling back to finding user by username');
             const users = await this.list({ username: user.username, exact: true });
             
             if (users && users.length > 0 && users[0].id) {
@@ -83,7 +89,7 @@ export class UsersApi {
                 return users[0].id;
             }
             
-            throw new Error('User was created but could not be found by username');
+            throw new Error('User was created but could not be found');
         } catch (error) {
             console.error('Error creating user:', error);
             throw new Error(`Failed to create user: ${error instanceof Error ? error.message : String(error)}`);

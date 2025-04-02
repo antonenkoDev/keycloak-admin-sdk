@@ -52,6 +52,26 @@ export async function makeRequest<T>(
             throw new RequestError(response.status, response.statusText, errorText);
         }
 
+        // Handle 201 Created responses with Location header (typically for resource creation)
+        if (response.status === 201) {
+            const location = response.headers.get('location');
+            if (location) {
+                console.log(`Resource created with location: ${location}`);
+                // Extract the ID from the location header (last part of the URL)
+                const id = location.split('/').pop();
+                if (id) {
+                    console.log(`Extracted ID from location header: ${id}`);
+                    // Only return ID as an object for create operations where we expect an ID
+                    // This is determined by checking if the method is POST and the URL ends with a collection endpoint
+                    if (method === 'POST' && (/\/(users|groups|clients|roles|client-scopes)$/.test(url))) {
+                        return { id } as T;
+                    }
+                }
+            }
+            // For other 201 responses without a location header or where we don't need to extract an ID
+            return {} as T;
+        }
+        
         // Handle 204 No Content responses
         if (response.status === 204) {
             return {} as T;

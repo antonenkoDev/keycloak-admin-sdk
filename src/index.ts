@@ -8,6 +8,7 @@ import { GroupsApi } from './api/groups';
 import { RealmsApi } from './api/realms';
 import { ClientsApi } from './api/clients';
 import { ClientScopesApi } from './api/client-scopes/client-scopes';
+import { ClientRoleMappingsApi } from './api/client-role-mappings/client-role-mappings';
 import { KeycloakConfig } from './types/auth';
 import { getToken } from './utils/auth';
 import { HttpMethod, makeRequest } from "./utils/request";
@@ -27,6 +28,7 @@ class KeycloakAdminSDK {
     public realms: RealmsApi;
     public clients: ClientsApi;
     public clientScopes: ClientScopesApi;
+    public clientRoleMappings: ClientRoleMappingsApi;
 
     /**
      * Creates a new instance of the Keycloak Admin SDK
@@ -44,6 +46,7 @@ class KeycloakAdminSDK {
         this.realms = new RealmsApi(this);
         this.clients = new ClientsApi(this);
         this.clientScopes = new ClientScopesApi(this);
+        this.clientRoleMappings = new ClientRoleMappingsApi(this);
     }
 
     /**

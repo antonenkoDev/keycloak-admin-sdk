@@ -44,6 +44,7 @@ export interface TestContext {
   sdk: KeycloakAdminSDK;
   realmName: string;
   clientId?: string;
+  clientUuid?: string; // Client UUID for role mappings
   clientId2?: string; // Additional client ID for testing
   clientSecret?: string;
   groupIds?: string[];
@@ -228,6 +229,70 @@ export async function createTestClient(context: TestContext): Promise<TestContex
 /**
  * Clean up the test environment by deleting all created resources
  * @param context The test context
+ */
+/**
+ * Create a test user in the specified realm
+ * 
+ * @param sdk - KeycloakAdminSDK instance
+ * @returns Created user representation
+ */
+export async function createTestUser(sdk: KeycloakAdminSDK) {
+  try {
+    // Generate a unique username
+    const username = generateUniqueName('test-user');
+    
+    // Create user
+    const userId = await sdk.users.create({
+      username,
+      enabled: true,
+      email: `${username}@example.com`,
+      firstName: 'Test',
+      lastName: 'User'
+    });
+    
+    console.log(`Created test user: ${username} with ID: ${userId}`);
+    
+    // Get the full user representation
+    const user = await sdk.users.get(userId);
+    return user;
+  } catch (error) {
+    console.error('Error creating test user:', error);
+    throw error;
+  }
+}
+
+/**
+ * Create a test group in the specified realm
+ * 
+ * @param sdk - KeycloakAdminSDK instance
+ * @returns Created group representation
+ */
+export async function createTestGroup(sdk: KeycloakAdminSDK) {
+  try {
+    // Generate a unique group name
+    const groupName = generateUniqueName('test-group');
+    
+    // Create group - using the enhanced API that returns the ID directly
+    const groupId = await sdk.groups.create({
+      name: groupName
+    });
+    
+    console.log(`Created test group: ${groupName} with ID: ${groupId}`);
+    
+    // Get the full group representation
+    const group = await sdk.groups.get(groupId);
+    return group;
+  } catch (error) {
+    console.error('Error creating test group:', error);
+    throw error;
+  }
+}
+
+/**
+ * Clean up the test environment by deleting all created resources
+ * 
+ * @param context The test context
+ * @returns Promise that resolves when cleanup is complete
  */
 export async function cleanupTestEnvironment(context: TestContext): Promise<void> {
   const { sdk, realmName, userIds, groupIds, clientId } = context;
