@@ -11,19 +11,75 @@ import {
     UserSessionRepresentation,
     FederatedIdentityRepresentation
 } from '../../types/users';
+import { RoleRepresentation } from '../../types/roles';
 import {ConsentsApi} from "./consents";
 import {CredentialsApi} from "./credentials";
 import {GroupsApi} from "./groups";
+import {UserRoleMappingsApi} from "./role-mappings";
 
 export class UsersApi {
     public consents: ConsentsApi;
     public credentials: CredentialsApi;
     public groups: GroupsApi;
+    private roleMappings: UserRoleMappingsApi;
 
     constructor(private sdk: KeycloakAdminSDK) {
         this.consents = new ConsentsApi(sdk);
         this.credentials = new CredentialsApi(sdk);
         this.groups = new GroupsApi(sdk);
+        this.roleMappings = new UserRoleMappingsApi(sdk);
+    }
+    
+    /**
+     * Get realm-level role mappings for a user
+     * 
+     * @param userId - User ID
+     * @returns Promise resolving to an array of role representations
+     */
+    async getRealmRoleMappings(userId: string): Promise<RoleRepresentation[]> {
+        return this.roleMappings.getRealmRoleMappings(userId);
+    }
+    
+    /**
+     * Add realm-level role mappings to a user
+     * 
+     * @param userId - User ID
+     * @param roles - Array of roles to add
+     * @returns Promise resolving when the operation completes
+     */
+    async addRealmRoles(userId: string, roles: RoleRepresentation[]): Promise<void> {
+        return this.roleMappings.addRealmRoles(userId, roles);
+    }
+    
+    /**
+     * Remove realm-level role mappings from a user
+     * 
+     * @param userId - User ID
+     * @param roles - Array of roles to remove
+     * @returns Promise resolving when the operation completes
+     */
+    async removeRealmRoles(userId: string, roles: RoleRepresentation[]): Promise<void> {
+        return this.roleMappings.removeRealmRoles(userId, roles);
+    }
+    
+    /**
+     * Get available realm-level roles that can be mapped to a user
+     * 
+     * @param userId - User ID
+     * @returns Promise resolving to an array of available role representations
+     */
+    async getAvailableRealmRoleMappings(userId: string): Promise<RoleRepresentation[]> {
+        return this.roleMappings.getAvailableRealmRoleMappings(userId);
+    }
+    
+    /**
+     * Get effective realm-level role mappings for a user (including composite roles)
+     * 
+     * @param userId - User ID
+     * @returns Promise resolving to an array of effective role representations
+     */
+    async getEffectiveRealmRoleMappings(userId: string): Promise<RoleRepresentation[]> {
+        return this.roleMappings.getEffectiveRealmRoleMappings(userId);
     }
 
     /**
