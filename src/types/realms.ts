@@ -4,6 +4,7 @@
 
 import { GroupRepresentation } from './groups';
 import { UserRepresentation } from './users';
+import { ClientRepresentation } from './clients';
 
 /**
  * Represents a Keycloak role
@@ -118,6 +119,7 @@ export interface RealmRepresentation {
     users?: UserRepresentation[];
     federatedUsers?: UserRepresentation[];
     attributes?: Record<string, string[]>;
+    clients?: ClientRepresentation[];
     smtpServer?: Record<string, string>;
     browserSecurityHeaders?: Record<string, string>;
     internationalizationEnabled?: boolean;

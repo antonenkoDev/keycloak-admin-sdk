@@ -7,6 +7,7 @@ import { UsersApi } from './api/users/users';
 import { GroupsApi } from './api/groups';
 import { RealmsApi } from './api/realms';
 import { ClientsApi } from './api/clients';
+import { ClientScopesApi } from './api/client-scopes/client-scopes';
 import { KeycloakConfig } from './types/auth';
 import { getToken } from './utils/auth';
 import { HttpMethod, makeRequest } from "./utils/request";
@@ -25,6 +26,7 @@ class KeycloakAdminSDK {
     public groups: GroupsApi;
     public realms: RealmsApi;
     public clients: ClientsApi;
+    public clientScopes: ClientScopesApi;
 
     /**
      * Creates a new instance of the Keycloak Admin SDK
@@ -41,6 +43,7 @@ class KeycloakAdminSDK {
         this.groups = new GroupsApi(this);
         this.realms = new RealmsApi(this);
         this.clients = new ClientsApi(this);
+        this.clientScopes = new ClientScopesApi(this);
     }
 
     /**
@@ -49,12 +52,20 @@ class KeycloakAdminSDK {
      * @returns {Promise<string>} A valid authentication token
      */
     async getValidToken(): Promise<string> {
-        if (this.token) {
-            return this.token;
-        }
+        try {
+            // Return cached token if available
+            if (this.token) {
+                return this.token;
+            }
 
-        this.token = await getToken(this.config);
-        return this.token;
+            // Get a new token
+            console.log('Getting a new authentication token');
+            this.token = await getToken(this.config);
+            return this.token;
+        } catch (error) {
+            console.error('Failed to get valid token:', error);
+            throw new Error(`Authentication failed: ${error instanceof Error ? error.message : String(error)}`);
+        }
     }
 
     /**
@@ -66,8 +77,16 @@ class KeycloakAdminSDK {
      * @returns {Promise<T>} The response data
      */
     async request<T>(endpoint: string, method: HttpMethod, body?: any): Promise<T> {
-        const token = await this.getValidToken();
-        return makeRequest<T>(`${this.baseUrl}${endpoint}`, method, token, body);
+        try {
+            console.log(`Making ${method} request to realm endpoint: ${endpoint}`);
+            const token = await this.getValidToken();
+            const url = `${this.baseUrl}${endpoint}`;
+            console.log(`Full URL: ${url}`);
+            return makeRequest<T>(url, method, token, body);
+        } catch (error) {
+            console.error(`Request failed for endpoint ${endpoint}:`, error);
+            throw error;
+        }
     }
     
     /**
@@ -80,8 +99,16 @@ class KeycloakAdminSDK {
      * @returns {Promise<T>} The response data
      */
     async requestWithoutRealm<T>(endpoint: string, method: HttpMethod, body?: any): Promise<T> {
-        const token = await this.getValidToken();
-        return makeRequest<T>(`${this.adminUrl}/realms${endpoint}`, method, token, body);
+        try {
+            console.log(`Making ${method} request to admin endpoint: ${endpoint}`);
+            const token = await this.getValidToken();
+            const url = `${this.adminUrl}/realms${endpoint}`;
+            console.log(`Full URL: ${url}`);
+            return makeRequest<T>(url, method, token, body);
+        } catch (error) {
+            console.error(`Request without realm failed for endpoint ${endpoint}:`, error);
+            throw error;
+        }
     }
     
     /**
@@ -95,8 +122,16 @@ class KeycloakAdminSDK {
      * @returns {Promise<T>} The response data
      */
     async requestForRealm<T>(realmName: string, endpoint: string, method: HttpMethod, body?: any): Promise<T> {
-        const token = await this.getValidToken();
-        return makeRequest<T>(`${this.adminUrl}/realms/${realmName}${endpoint}`, method, token, body);
+        try {
+            console.log(`Making ${method} request to realm ${realmName} endpoint: ${endpoint}`);
+            const token = await this.getValidToken();
+            const url = `${this.adminUrl}/realms/${realmName}${endpoint}`;
+            console.log(`Full URL: ${url}`);
+            return makeRequest<T>(url, method, token, body);
+        } catch (error) {
+            console.error(`Request for realm ${realmName} failed for endpoint ${endpoint}:`, error);
+            throw error;
+        }
     }
 }
 

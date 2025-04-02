@@ -51,18 +51,41 @@ export class UsersApi {
      * Endpoint: POST /admin/realms/{realm}/users
      *
      * @param {UserRepresentation} user - The user representation to create
-     * @returns {Promise<UserRepresentation>} The created user
+     * @returns {Promise<string>} The ID of the created user
      * @throws {Error} If the request fails or user data is invalid
      */
-    async create(user: UserRepresentation): Promise<UserRepresentation> {
+    async create(user: UserRepresentation): Promise<string> {
         if (!user) {
             throw new Error('User data is required');
         }
 
         try {
+            // Ensure username is provided (required by Keycloak)
+            if (!user.username) {
+                throw new Error('Username is required');
+            }
+            
+            console.log(`Creating user with username: ${user.username}`);
+            
+            // Create a separate endpoint for user creation
             const endpoint = `/users`;
-            return this.sdk.request<UserRepresentation>(endpoint, 'POST', user);
+            
+            // Make the POST request to create the user
+            // Keycloak returns a 201 Created with a Location header containing the user ID
+            await this.sdk.request<void>(endpoint, 'POST', user);
+            
+            // After creating the user, we need to find it by username to get the ID
+            console.log(`Finding created user by username: ${user.username}`);
+            const users = await this.list({ username: user.username, exact: true });
+            
+            if (users && users.length > 0 && users[0].id) {
+                console.log(`Found user with ID: ${users[0].id}`);
+                return users[0].id;
+            }
+            
+            throw new Error('User was created but could not be found by username');
         } catch (error) {
+            console.error('Error creating user:', error);
             throw new Error(`Failed to create user: ${error instanceof Error ? error.message : String(error)}`);
         }
     }
