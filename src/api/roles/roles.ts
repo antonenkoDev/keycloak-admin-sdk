@@ -11,6 +11,7 @@ import { RoleRepresentation, RoleQuery } from '../../types/roles';
 import { GroupRepresentation } from '../../types/groups';
 import { UserRepresentation } from '../../types/users';
 import { ManagementPermissionReference } from '../../types/permissions';
+import { RolesByIdApi } from './roles-by-id';
 
 /**
  * Roles API
@@ -19,6 +20,10 @@ import { ManagementPermissionReference } from '../../types/permissions';
  */
 export class RolesApi {
   private sdk: KeycloakAdminSDK;
+  /**
+   * Roles by ID API for direct ID-based operations
+   */
+  public byId: RolesByIdApi;
 
   /**
    * Constructor for RolesApi
@@ -27,6 +32,7 @@ export class RolesApi {
    */
   constructor(sdk: KeycloakAdminSDK) {
     this.sdk = sdk;
+    this.byId = new RolesByIdApi(sdk);
   }
 
   /**
@@ -136,18 +142,11 @@ export class RolesApi {
    * 
    * @param id - Role ID
    * @returns Promise resolving to the role representation
+   * @deprecated Use byId.get() instead
    */
   async getById(id: string): Promise<RoleRepresentation> {
-    if (!id) {
-      throw new Error('Role ID is required');
-    }
-    
-    try {
-      return this.sdk.request<RoleRepresentation>(`/roles-by-id/${id}`, 'GET');
-    } catch (error) {
-      console.error(`Error getting role by ID ${id}:`, error);
-      throw new Error(`Failed to get role by ID: ${error instanceof Error ? error.message : String(error)}`);
-    }
+    console.warn('RolesApi.getById() is deprecated. Use RolesApi.byId.get() instead.');
+    return this.byId.get(id);
   }
 
   /**
