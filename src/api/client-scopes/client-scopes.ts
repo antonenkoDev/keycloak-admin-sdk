@@ -56,8 +56,18 @@ export class ClientScopesApi {
         }
         
         try {
-            const response = await this.sdk.request<{ id: string }>('/client-scopes', 'POST', clientScope);
-            return response.id;
+            // Make the request to create the client scope
+            const response = await this.sdk.request<any>('/client-scopes', 'POST', clientScope);
+            
+            // Find the created client scope by name to get its ID
+            const clientScopes = await this.findAll();
+            const createdScope = clientScopes.find(scope => scope.name === clientScope.name);
+            
+            if (createdScope && createdScope.id) {
+                return createdScope.id;
+            }
+            
+            throw new Error('Client scope was created but ID could not be retrieved');
         } catch (error) {
             throw new Error(`Failed to create client scope: ${error instanceof Error ? error.message : String(error)}`);
         }
@@ -180,8 +190,18 @@ export class ClientScopesApi {
         }
         
         try {
-            const response = await this.sdk.request<{ id: string }>(`/client-scopes/${id}/protocol-mappers/models`, 'POST', mapper);
-            return response.id;
+            // Create the protocol mapper
+            await this.sdk.request<void>(`/client-scopes/${id}/protocol-mappers/models`, 'POST', mapper);
+            
+            // Get all protocol mappers to find the ID of the one we just created
+            const mappers = await this.getProtocolMappers(id);
+            const createdMapper = mappers.find(m => m.name === mapper.name);
+            
+            if (createdMapper && createdMapper.id) {
+                return createdMapper.id;
+            }
+            
+            throw new Error('Protocol mapper was created but ID could not be retrieved');
         } catch (error) {
             throw new Error(`Failed to create protocol mapper: ${error instanceof Error ? error.message : String(error)}`);
         }
@@ -238,9 +258,28 @@ export class ClientScopesApi {
         }
         
         try {
-            await this.sdk.request<void>(`/client-scopes/${id}/protocol-mappers/models/${mapperId}`, 'PUT', mapper);
+            // First get the current mapper to ensure we have all required fields
+            const currentMapper = await this.getProtocolMapper(id, mapperId);
+            
+            // Create a merged mapper with current values and updates
+            // This follows the Open/Closed principle by extending functionality without modifying existing code
+            const updatedMapper: ProtocolMapperRepresentation = {
+                ...currentMapper,
+                // Override with new values from the mapper parameter
+                ...mapper,
+                // Ensure ID is preserved
+                id: mapperId
+            };
+            
+            // Send the update request
+            await this.sdk.request<void>(`/client-scopes/${id}/protocol-mappers/models/${mapperId}`, 'PUT', updatedMapper);
         } catch (error) {
-            throw new Error(`Failed to update protocol mapper: ${error instanceof Error ? error.message : String(error)}`);
+            // Provide detailed error information for better debugging
+            if (error instanceof Error) {
+                throw new Error(`Failed to update protocol mapper: ${error.message}${error.stack ? '\n' + error.stack : ''}`);
+            } else {
+                throw new Error(`Failed to update protocol mapper: ${String(error)}`);
+            }
         }
     }
 
