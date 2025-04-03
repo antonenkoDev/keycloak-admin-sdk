@@ -238,6 +238,92 @@ export interface GetAdminEventsParams {
 }
 
 /**
+ * Client type representation
+ */
+export interface ClientTypeRepresentation {
+    id?: string;
+    name?: string;
+    description?: string;
+    global?: boolean;
+    builtin?: boolean;
+    clientAttributes?: Record<string, string>;
+}
+
+/**
+ * Client types representation
+ */
+export interface ClientTypesRepresentation {
+    global?: ClientTypeRepresentation[];
+    realm?: ClientTypeRepresentation[];
+}
+
+/**
+ * Client policy condition representation
+ */
+export interface ClientPolicyConditionRepresentation {
+    condition?: string;
+    configuration?: Record<string, any>;
+}
+
+/**
+ * Client policy executor representation
+ */
+export interface ClientPolicyExecutorRepresentation {
+    executor?: string;
+    configuration?: Record<string, any>;
+}
+
+/**
+ * Client policy representation
+ */
+export interface ClientPolicyRepresentation {
+    name?: string;
+    description?: string;
+    enabled?: boolean;
+    conditions?: ClientPolicyConditionRepresentation[];
+    // Profiles that this policy applies to (not executors)
+    profiles?: string[];
+}
+
+/**
+ * Client policies representation
+ */
+export interface ClientPoliciesRepresentation {
+    policies?: ClientPolicyRepresentation[];
+    // Global policies that apply to all realms
+    globalPolicies?: ClientPolicyRepresentation[];
+}
+
+/**
+ * Client profile representation
+ */
+export interface ClientProfileRepresentation {
+    name?: string;
+    description?: string;
+    executors?: ClientPolicyExecutorRepresentation[];
+    // Whether this is a global profile
+    global?: boolean;
+}
+
+/**
+ * Client profiles representation
+ */
+export interface ClientProfilesRepresentation {
+    profiles?: ClientProfileRepresentation[];
+    // Global profiles that apply to all realms
+    globalProfiles?: ClientProfileRepresentation[];
+}
+
+/**
+ * Management permission reference
+ */
+export interface ManagementPermissionReference {
+    enabled?: boolean;
+    resource?: string;
+    scopePermissions?: Record<string, string>;
+}
+
+/**
  * Global request result
  */
 export interface GlobalRequestResult {
