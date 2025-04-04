@@ -35,7 +35,7 @@ export async function makeRequest<T>(
     Authorization: `Bearer ${token}`,
     ...options?.headers
   };
-  
+
   // Set default content type to application/json if not specified in options
   if (!headers['Content-Type']) {
     headers['Content-Type'] = 'application/json';
@@ -47,9 +47,7 @@ export async function makeRequest<T>(
   const requestOptions: RequestInit = {
     method,
     headers,
-    body: body ? (
-      isFormData || typeof body === 'string' ? body : JSON.stringify(body)
-    ) : undefined
+    body: body ? (isFormData || typeof body === 'string' ? body : JSON.stringify(body)) : undefined
   };
 
   try {

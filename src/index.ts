@@ -139,8 +139,8 @@ class KeycloakAdminSDK {
    * @returns {Promise<T>} The response data
    */
   async requestWithoutRealm<T>(
-    endpoint: string, 
-    method: HttpMethod, 
+    endpoint: string,
+    method: HttpMethod,
     body?: any,
     options?: { headers?: Record<string, string> }
   ): Promise<T> {

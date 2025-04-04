@@ -8,7 +8,10 @@
 
 import KeycloakAdminSDK from '../../index';
 import { IdentityProviderRepresentation } from '../../types/identity-providers';
-import { IdentityProviderMapperRepresentation, IdentityProviderMapperTypeRepresentation } from '../../types/identity-provider-mappers';
+import {
+  IdentityProviderMapperRepresentation,
+  IdentityProviderMapperTypeRepresentation
+} from '../../types/identity-provider-mappers';
 
 /**
  * Identity Providers API
@@ -30,15 +33,27 @@ export class IdentityProvidersApi {
   /**
    * Get all identity providers
    *
-   * Endpoint: GET /{realm}/identity-providers/instances
+   * Endpoint: GET /admin/realms/{realm}/identity-provider/instances
    *
+   * @param briefRepresentation - Whether to return brief representations
+   * @param first - Pagination offset
+   * @param max - Maximum results size (defaults to 100)
+   * @param search - Filter providers by name
    * @returns Promise resolving to an array of identity provider representations
    */
-  async findAll(): Promise<IdentityProviderRepresentation[]> {
+  async findAll(options?: {
+    briefRepresentation?: boolean;
+    first?: number;
+    max?: number;
+    search?: string;
+    realmOnly?: boolean;
+  }): Promise<IdentityProviderRepresentation[]> {
     try {
       return this.sdk.request<IdentityProviderRepresentation[]>(
-        '/identity-providers/instances',
-        'GET'
+        '/identity-provider/instances',
+        'GET',
+        undefined,
+        options
       );
     } catch (error) {
       console.error('Error listing identity providers:', error);
@@ -51,10 +66,10 @@ export class IdentityProvidersApi {
   /**
    * Create a new identity provider
    *
-   * Endpoint: POST /{realm}/identity-providers/instances
+   * Endpoint: POST /admin/realms/{realm}/identity-provider/instances
    *
    * @param provider - Identity provider representation to create
-   * @returns Promise resolving to the ID of the created identity provider
+   * @returns Promise resolving to the alias of the created identity provider
    */
   async create(provider: IdentityProviderRepresentation): Promise<string> {
     if (!provider) {
@@ -67,18 +82,10 @@ export class IdentityProvidersApi {
 
     try {
       // Make the POST request to create the identity provider
-      // Keycloak returns a 201 Created with a Location header containing the provider ID
-      const result = await this.sdk.request<{ id: string }>(
-        '/identity-providers/instances',
-        'POST',
-        provider
-      );
+      // Keycloak returns a 201 Created status
+      await this.sdk.request<void>('/identity-provider/instances', 'POST', provider);
 
-      if (result && result.id) {
-        return result.id;
-      }
-
-      // If we didn't get an ID, return the alias as the ID
+      // Return the alias as the identifier
       return provider.alias;
     } catch (error) {
       console.error('Error creating identity provider:', error);
@@ -91,7 +98,7 @@ export class IdentityProvidersApi {
   /**
    * Get an identity provider by alias
    *
-   * Endpoint: GET /{realm}/identity-providers/instances/{alias}
+   * Endpoint: GET /admin/realms/{realm}/identity-provider/instances/{alias}
    *
    * @param alias - Identity provider alias
    * @returns Promise resolving to the identity provider representation
@@ -103,7 +110,7 @@ export class IdentityProvidersApi {
 
     try {
       return this.sdk.request<IdentityProviderRepresentation>(
-        `/identity-providers/instances/${alias}`,
+        `/identity-provider/instances/${alias}`,
         'GET'
       );
     } catch (error) {
@@ -117,7 +124,7 @@ export class IdentityProvidersApi {
   /**
    * Update an identity provider
    *
-   * Endpoint: PUT /{realm}/identity-providers/instances/{alias}
+   * Endpoint: PUT /admin/realms/{realm}/identity-provider/instances/{alias}
    *
    * @param alias - Identity provider alias
    * @param provider - Updated identity provider representation
@@ -133,11 +140,7 @@ export class IdentityProvidersApi {
     }
 
     try {
-      await this.sdk.request<void>(
-        `/identity-providers/instances/${alias}`,
-        'PUT',
-        provider
-      );
+      await this.sdk.request<void>(`/identity-provider/instances/${alias}`, 'PUT', provider);
     } catch (error) {
       console.error(`Error updating identity provider with alias ${alias}:`, error);
       throw new Error(
@@ -149,7 +152,7 @@ export class IdentityProvidersApi {
   /**
    * Delete an identity provider
    *
-   * Endpoint: DELETE /{realm}/identity-providers/instances/{alias}
+   * Endpoint: DELETE /admin/realms/{realm}/identity-provider/instances/{alias}
    *
    * @param alias - Identity provider alias
    * @returns Promise resolving when the deletion is complete
@@ -160,10 +163,7 @@ export class IdentityProvidersApi {
     }
 
     try {
-      await this.sdk.request<void>(
-        `/identity-providers/instances/${alias}`,
-        'DELETE'
-      );
+      await this.sdk.request<void>(`/identity-provider/instances/${alias}`, 'DELETE');
     } catch (error) {
       console.error(`Error deleting identity provider with alias ${alias}:`, error);
       throw new Error(
@@ -175,7 +175,7 @@ export class IdentityProvidersApi {
   /**
    * Get the factory for a specific identity provider type
    *
-   * Endpoint: GET /{realm}/identity-providers/providers/{provider-id}
+   * Endpoint: GET /admin/realms/{realm}/identity-provider/providers/{provider_id}
    *
    * @param providerId - Identity provider type ID (e.g., 'oidc', 'saml')
    * @returns Promise resolving to the identity provider factory
@@ -187,7 +187,7 @@ export class IdentityProvidersApi {
 
     try {
       return this.sdk.request<Record<string, any>>(
-        `/identity-providers/providers/${providerId}`,
+        `/identity-provider/providers/${providerId}`,
         'GET'
       );
     } catch (error) {
@@ -199,22 +199,27 @@ export class IdentityProvidersApi {
   }
 
   /**
-   * Get all available identity provider types
+   * Get a specific provider type
    *
-   * Endpoint: GET /{realm}/identity-providers/providers
+   * Endpoint: GET /admin/realms/{realm}/identity-provider/providers/{provider_id}
    *
-   * @returns Promise resolving to a map of provider types
+   * @param providerId - The ID of the provider type to get
+   * @returns Promise resolving to the provider type configuration
    */
-  async getProviderTypes(): Promise<Record<string, any>> {
+  async getProviderType(providerId: string): Promise<Record<string, any>> {
+    if (!providerId) {
+      throw new Error('Provider ID is required');
+    }
+
     try {
       return this.sdk.request<Record<string, any>>(
-        '/identity-providers/providers',
+        `/identity-provider/providers/${providerId}`,
         'GET'
       );
     } catch (error) {
-      console.error('Error getting provider types:', error);
+      console.error(`Error getting provider type ${providerId}:`, error);
       throw new Error(
-        `Failed to get provider types: ${error instanceof Error ? error.message : String(error)}`
+        `Failed to get provider type: ${error instanceof Error ? error.message : String(error)}`
       );
     }
   }
@@ -222,7 +227,7 @@ export class IdentityProvidersApi {
   /**
    * Import an identity provider from a JSON file
    *
-   * Endpoint: POST /{realm}/identity-providers/import-config
+   * Endpoint: POST /admin/realms/{realm}/identity-provider/import-config
    *
    * @param providerJson - JSON string containing the provider configuration
    * @returns Promise resolving to the imported identity provider representation
@@ -238,9 +243,10 @@ export class IdentityProvidersApi {
       formData.append('file', blob);
 
       return this.sdk.request<IdentityProviderRepresentation>(
-        '/identity-providers/import-config',
+        '/identity-provider/import-config',
         'POST',
-        formData
+        formData,
+        { headers: { 'Content-Type': 'multipart/form-data' } }
       );
     } catch (error) {
       console.error('Error importing identity provider from JSON:', error);
@@ -253,7 +259,7 @@ export class IdentityProvidersApi {
   /**
    * Get all mappers for an identity provider
    *
-   * Endpoint: GET /{realm}/identity-providers/instances/{alias}/mappers
+   * Endpoint: GET /admin/realms/{realm}/identity-provider/instances/{alias}/mappers
    *
    * @param alias - Identity provider alias
    * @returns Promise resolving to an array of identity provider mapper representations
@@ -265,7 +271,7 @@ export class IdentityProvidersApi {
 
     try {
       return this.sdk.request<IdentityProviderMapperRepresentation[]>(
-        `/identity-providers/instances/${alias}/mappers`,
+        `/identity-provider/instances/${alias}/mappers`,
         'GET'
       );
     } catch (error) {
@@ -279,7 +285,7 @@ export class IdentityProvidersApi {
   /**
    * Create a new mapper for an identity provider
    *
-   * Endpoint: POST /{realm}/identity-providers/instances/{alias}/mappers
+   * Endpoint: POST /admin/realms/{realm}/identity-provider/instances/{alias}/mappers
    *
    * @param alias - Identity provider alias
    * @param mapper - Identity provider mapper representation to create
@@ -295,18 +301,20 @@ export class IdentityProvidersApi {
     }
 
     try {
-      const result = await this.sdk.request<{ id: string }>(
-        `/identity-providers/instances/${alias}/mappers`,
+      // According to the Keycloak API, this endpoint returns 201 Created with the ID in the response
+      const response = await this.sdk.request<{ id: string }>(
+        `/identity-provider/instances/${alias}/mappers`,
         'POST',
         mapper
       );
 
-      if (result && result.id) {
-        return result.id;
+      if (response && response.id) {
+        return response.id;
+      } else {
+        // If we don't get an ID back, use the name as a fallback
+        console.warn('No ID returned from create mapper endpoint, using name as ID');
+        return mapper.name || '';
       }
-
-      // If we didn't get an ID, return the name as the ID
-      return mapper.name || '';
     } catch (error) {
       console.error(`Error creating mapper for identity provider ${alias}:`, error);
       throw new Error(
@@ -318,7 +326,7 @@ export class IdentityProvidersApi {
   /**
    * Get a specific mapper for an identity provider
    *
-   * Endpoint: GET /{realm}/identity-providers/instances/{alias}/mappers/{id}
+   * Endpoint: GET /admin/realms/{realm}/identity-provider/instances/{alias}/mappers/{id}
    *
    * @param alias - Identity provider alias
    * @param id - Mapper ID
@@ -335,7 +343,7 @@ export class IdentityProvidersApi {
 
     try {
       return this.sdk.request<IdentityProviderMapperRepresentation>(
-        `/identity-providers/instances/${alias}/mappers/${id}`,
+        `/identity-provider/instances/${alias}/mappers/${id}`,
         'GET'
       );
     } catch (error) {
@@ -349,7 +357,7 @@ export class IdentityProvidersApi {
   /**
    * Update a mapper for an identity provider
    *
-   * Endpoint: PUT /{realm}/identity-providers/instances/{alias}/mappers/{id}
+   * Endpoint: PUT /admin/realms/{realm}/identity-provider/instances/{alias}/mappers/{id}
    *
    * @param alias - Identity provider alias
    * @param id - Mapper ID
@@ -375,7 +383,7 @@ export class IdentityProvidersApi {
 
     try {
       await this.sdk.request<void>(
-        `/identity-providers/instances/${alias}/mappers/${id}`,
+        `/identity-provider/instances/${alias}/mappers/${id}`,
         'PUT',
         mapper
       );
@@ -390,7 +398,7 @@ export class IdentityProvidersApi {
   /**
    * Delete a mapper for an identity provider
    *
-   * Endpoint: DELETE /{realm}/identity-providers/instances/{alias}/mappers/{id}
+   * Endpoint: DELETE /admin/realms/{realm}/identity-provider/instances/{alias}/mappers/{id}
    *
    * @param alias - Identity provider alias
    * @param id - Mapper ID
@@ -406,10 +414,7 @@ export class IdentityProvidersApi {
     }
 
     try {
-      await this.sdk.request<void>(
-        `/identity-providers/instances/${alias}/mappers/${id}`,
-        'DELETE'
-      );
+      await this.sdk.request<void>(`/identity-provider/instances/${alias}/mappers/${id}`, 'DELETE');
     } catch (error) {
       console.error(`Error deleting mapper ${id} for identity provider ${alias}:`, error);
       throw new Error(
@@ -421,19 +426,22 @@ export class IdentityProvidersApi {
   /**
    * Get available mapper types for an identity provider
    *
-   * Endpoint: GET /{realm}/identity-providers/instances/{alias}/mapper-types
+   * Endpoint: GET /admin/realms/{realm}/identity-provider/instances/{alias}/mapper-types
    *
    * @param alias - Identity provider alias
-   * @returns Promise resolving to an array of identity provider mapper type representations
+   * @returns Promise resolving to a map of identity provider mapper type representations
    */
-  async getMapperTypes(alias: string): Promise<IdentityProviderMapperTypeRepresentation[]> {
+  async getMapperTypes(
+    alias: string
+  ): Promise<Record<string, IdentityProviderMapperTypeRepresentation>> {
     if (!alias) {
       throw new Error('Identity provider alias is required');
     }
 
     try {
-      return this.sdk.request<IdentityProviderMapperTypeRepresentation[]>(
-        `/identity-providers/instances/${alias}/mapper-types`,
+      // According to the Keycloak API documentation, this returns a Map of mapper types
+      return this.sdk.request<Record<string, IdentityProviderMapperTypeRepresentation>>(
+        `/identity-provider/instances/${alias}/mapper-types`,
         'GET'
       );
     } catch (error) {

@@ -65,7 +65,7 @@ export async function setupTestEnvironment(): Promise<TestContext> {
   const adminSdk = new KeycloakAdminSDK(config);
   const realmName = generateUniqueName('test-realm');
 
-  // Create a test realm with email configuration
+  // Create a test realm with email configuration and authorization enabled
   const realm: RealmRepresentation = {
     realm: realmName,
     enabled: true,
@@ -83,9 +83,21 @@ export async function setupTestEnvironment(): Promise<TestContext> {
     adminEventsEnabled: true,
     adminEventsDetailsEnabled: true,
     organizationsEnabled: true,
+    // Enable authorization features
+    revokeRefreshToken: true,
+    accessTokenLifespan: 300,
+    accessTokenLifespanForImplicitFlow: 900,
+    ssoSessionIdleTimeout: 1800,
+    ssoSessionMaxLifespan: 36000,
+    offlineSessionIdleTimeout: 2592000,
+    accessCodeLifespan: 60,
+    accessCodeLifespanUserAction: 300,
+    accessCodeLifespanLogin: 1800,
+    actionTokenGeneratedByAdminLifespan: 43200,
+    actionTokenGeneratedByUserLifespan: 300,
     // Email configuration for the test realm
     smtpServer: {
-      host: 'mailhog',  // Use the Docker service name
+      host: 'mailhog', // Use the Docker service name
       port: '1025',
       from: 'keycloak@localhost',
       fromDisplayName: 'Keycloak Test',
@@ -99,7 +111,7 @@ export async function setupTestEnvironment(): Promise<TestContext> {
     // Create the realm using the admin SDK
     await adminSdk.realms.create(realm);
     console.log(`Test realm created: ${realmName} with email configuration`);
-    
+
     // Verify email configuration after realm creation
     try {
       const createdRealm = await adminSdk.realms.get(realmName);
@@ -113,13 +125,15 @@ export async function setupTestEnvironment(): Promise<TestContext> {
         console.warn(`Email configuration not found in created realm ${realmName}`);
       }
     } catch (error) {
-      console.error(`Error verifying email configuration: ${error instanceof Error ? error.message : String(error)}`);
+      console.error(
+        `Error verifying email configuration: ${error instanceof Error ? error.message : String(error)}`
+      );
     }
-    
+
     // Create an admin user in the test realm
     const adminUsername = 'test-admin';
     const adminPassword = 'test-password';
-    
+
     // Create the admin user using the master realm SDK with all required fields
     // Following SOLID principles - complete user representation with all required fields
     const adminUser = {
@@ -141,45 +155,77 @@ export async function setupTestEnvironment(): Promise<TestContext> {
         phoneNumber: ['555-1234']
       },
       requiredActions: [], // No required actions to complete
-      realmRoles: ['admin', 'offline_access', 'uma_authorization']
+      // Include all necessary roles for authorization management
+      realmRoles: [
+        'admin',
+        'offline_access',
+        'uma_authorization',
+        'create-realm',
+        'manage-users',
+        'manage-clients',
+        'manage-realm',
+        'manage-events',
+        'manage-authorization'
+      ]
     };
-    
+
     // Create the admin user in the test realm
-    const adminUserId = await adminSdk.requestForRealm<{id: string}>(realmName, '/users', 'POST', adminUser);
+    const adminUserId = await adminSdk.requestForRealm<{ id: string }>(
+      realmName,
+      '/users',
+      'POST',
+      adminUser
+    );
     console.log(`Created admin user in test realm: ${adminUserId.id}`);
-    
+
+    // Enable permissions for the realm
+    try {
+      await adminSdk.requestForRealm(
+        realmName,
+        '/management/permissions',
+        'PUT',
+        { enabled: true }
+      );
+    } catch (error) {
+      console.error(`Error enabling realm permissions: ${error instanceof Error ? error.message : String(error)}`);
+    }
+
     // Assign the admin role to the user
     // First, get the realm-management client ID
     interface ClientRepresentation {
       id: string;
       clientId: string;
     }
-    
-    const clients = await adminSdk.requestForRealm<ClientRepresentation[]>(realmName, '/clients', 'GET');
+
+    const clients = await adminSdk.requestForRealm<ClientRepresentation[]>(
+      realmName,
+      '/clients',
+      'GET'
+    );
     const realmManagementClient = clients.find(client => client.clientId === 'realm-management');
-    
+
     if (!realmManagementClient || !realmManagementClient.id) {
       throw new Error('Could not find realm-management client');
     }
-    
+
     // Get the realm-admin role ID
     interface RoleRepresentation {
       id: string;
       name: string;
     }
-    
+
     const roles = await adminSdk.requestForRealm<RoleRepresentation[]>(
-      realmName, 
-      `/clients/${realmManagementClient.id}/roles`, 
+      realmName,
+      `/clients/${realmManagementClient.id}/roles`,
       'GET'
     );
-    
+
     const adminRole = roles.find(role => role.name === 'realm-admin');
-    
+
     if (!adminRole || !adminRole.id) {
       throw new Error('Could not find realm-admin role');
     }
-    
+
     // Assign the role to the user
     await adminSdk.requestForRealm<void>(
       realmName,
@@ -187,9 +233,9 @@ export async function setupTestEnvironment(): Promise<TestContext> {
       'POST',
       [adminRole]
     );
-    
+
     console.log('Assigned realm-admin role to test admin user');
-    
+
     // Create a new SDK instance that uses the test realm admin credentials
     const testRealmConfig: KeycloakConfig = {
       baseUrl: config.baseUrl,
@@ -201,9 +247,9 @@ export async function setupTestEnvironment(): Promise<TestContext> {
         clientId: 'admin-cli'
       }
     };
-    
+
     const sdk = new KeycloakAdminSDK(testRealmConfig);
-    
+
     // Return context with the SDK and realm name
     return {
       sdk,
@@ -471,7 +517,7 @@ export async function cleanupTestEnvironment(context: TestContext): Promise<void
       ...config,
       realm: 'master' // Always use master realm for administrative operations
     });
-    
+
     // Delete the test realm using the admin SDK
     try {
       await adminSdk.realms.delete(realmName);
