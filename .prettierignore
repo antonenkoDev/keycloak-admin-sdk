@@ -1,0 +1,7 @@
+lib
+node_modules
+coverage
+dist
+build
+.idea
+.vscode

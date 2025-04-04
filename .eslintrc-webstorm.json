@@ -1,0 +1,7 @@
+{
+  "extends": ["./.eslintrc.json"],
+  "rules": {
+    "semi": ["error", "always"],
+    "@typescript-eslint/semi": ["error", "always"]
+  }
+}
