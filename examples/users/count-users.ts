@@ -19,7 +19,6 @@ const sdk = new KeycloakAdminSDK(config);
     try {
         // Get user count with optional filters
         const userCount = await sdk.users.count({ enabled: true, emailVerified: true });
-        console.log('User count:', userCount);
     } catch (error) {
         console.error('Error fetching user count:', error);
     }

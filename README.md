@@ -37,7 +37,7 @@ const sdk = new KeycloakAdminSDK({
 async function listUsers() {
   try {
     const users = await sdk.users.list();
-    console.log(`Found ${users.length} users`);
+    
     users.forEach(user => {
       console.log(`- ${user.username} (${user.email})`);
     });

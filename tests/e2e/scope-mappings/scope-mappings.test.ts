@@ -23,7 +23,7 @@ let clientRole: RoleRepresentation;
 
 describe('Scope Mappings API E2E Tests', () => {
   beforeAll(async () => {
-    console.log('Setting up test environment for scope mappings tests');
+    
     
     // Setup test environment
     const setup = await setupTestEnvironment();
@@ -93,22 +93,22 @@ describe('Scope Mappings API E2E Tests', () => {
   afterAll(async () => {
     // Clean up test resources
     if (clientId) {
-      console.log(`Deleting test client: ${clientId}`);
+      
       await sdk.clients.delete(clientId);
     }
     
     if (targetClientId) {
-      console.log(`Deleting target client: ${targetClientId}`);
+      
       await sdk.clients.delete(targetClientId);
     }
     
     if (clientScopeId) {
-      console.log(`Deleting test client scope: ${clientScopeId}`);
+      
       await sdk.clientScopes.delete(clientScopeId);
     }
     
     if (role && role.name) {
-      console.log(`Deleting test role: ${role.name}`);
+      
       await sdk.roles.delete(role.name);
     }
     

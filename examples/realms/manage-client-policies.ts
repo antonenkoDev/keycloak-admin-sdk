@@ -15,11 +15,11 @@ import { ClientPoliciesRepresentation, ClientProfilesRepresentation } from "../.
     // Initialize the SDK
     const sdk = new KeycloakAdminSDK(config);
     
-    console.log('Getting client policies...');
+    
     
     // Get client policies including global policies
     const policies = await sdk.realms.getClientPolicies(config.realm, true);
-    console.log('Current client policies:');
+    
     console.log(JSON.stringify(policies, null, 2));
     
     // Create or update client policies
@@ -44,14 +44,14 @@ import { ClientPoliciesRepresentation, ClientProfilesRepresentation } from "../.
       ]
     };
     
-    console.log('Updating client policies...');
+    
     await sdk.realms.updateClientPolicies(config.realm, updatedPolicies);
-    console.log('Client policies updated successfully');
+    
     
     // Get client profiles
-    console.log('Getting client profiles...');
+    
     const profiles = await sdk.realms.getClientProfiles(config.realm, true);
-    console.log('Current client profiles:');
+    
     console.log(JSON.stringify(profiles, null, 2));
     
     // Create or update client profiles
@@ -73,18 +73,18 @@ import { ClientPoliciesRepresentation, ClientProfilesRepresentation } from "../.
       ]
     };
     
-    console.log('Updating client profiles...');
+    
     await sdk.realms.updateClientProfiles(config.realm, updatedProfiles);
-    console.log('Client profiles updated successfully');
+    
     
     // Get updated client policies to verify changes
     const updatedPoliciesResult = await sdk.realms.getClientPolicies(config.realm, true);
-    console.log('Updated client policies:');
+    
     console.log(JSON.stringify(updatedPoliciesResult, null, 2));
     
     // Get updated client profiles to verify changes
     const updatedProfilesResult = await sdk.realms.getClientProfiles(config.realm, true);
-    console.log('Updated client profiles:');
+    
     console.log(JSON.stringify(updatedProfilesResult, null, 2));
     
   } catch (error) {

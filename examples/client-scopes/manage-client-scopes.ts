@@ -44,7 +44,7 @@ async function manageClientScopes() {
   try {
     // Step 1: Create a new client scope
     const scopeName = `custom-scope-${Date.now()}`;
-    console.log(`\n=== Step 1: Creating client scope: ${scopeName} ===`);
+    
     
     const clientScope: ClientScopeRepresentation = {
       name: scopeName,
@@ -57,10 +57,10 @@ async function manageClientScopes() {
     };
     
     const clientScopeId = await sdk.clientScopes.create(clientScope);
-    console.log(`Client scope created with ID: ${clientScopeId}`);
+    
     
     // Step 2: Update the client scope with additional attributes
-    console.log(`\n=== Step 2: Updating client scope ===`);
+    
     
     // Get current scope to ensure we're not overwriting existing properties
     const currentScope = await sdk.clientScopes.findById(clientScopeId);
@@ -78,10 +78,10 @@ async function manageClientScopes() {
     };
     
     await sdk.clientScopes.update(clientScopeId, updatedScope);
-    console.log(`Client scope updated successfully`);
+    
     
     // Step 3: Add protocol mappers to the client scope
-    console.log(`\n=== Step 3: Adding protocol mappers ===`);
+    
     
     // Create a custom attribute mapper
     const customAttributeMapper: ProtocolMapperRepresentation = {
@@ -121,20 +121,20 @@ async function manageClientScopes() {
     
     try {
       attributeMapperId = await sdk.clientScopes.createProtocolMapper(clientScopeId, customAttributeMapper);
-      console.log(`Custom attribute mapper created with ID: ${attributeMapperId}`);
+      
     } catch (error) {
       console.error(`Failed to create attribute mapper: ${error instanceof Error ? error.message : String(error)}`);
     }
     
     try {
       roleMapperId = await sdk.clientScopes.createProtocolMapper(clientScopeId, roleMapper);
-      console.log(`Role mapper created with ID: ${roleMapperId}`);
+      
     } catch (error) {
       console.error(`Failed to create role mapper: ${error instanceof Error ? error.message : String(error)}`);
     }
     
     // Step 4: Find a client to assign the scope to
-    console.log(`\n=== Step 4: Finding a client to assign the scope to ===`);
+    
     
     // Get all clients with defensive programming
     let clients;
@@ -165,11 +165,11 @@ async function manageClientScopes() {
     console.log(`Selected client: ${targetClient.clientId} (${targetClient.id})`);
     
     // Step 5: Assign the client scope as an optional scope to the client
-    console.log(`\n=== Step 5: Assigning client scope as optional scope ===`);
+    
     
     try {
       await sdk.clients.addOptionalClientScope(targetClient.id, clientScopeId);
-      console.log(`Added ${scopeName} as optional scope to client ${targetClient.clientId}`);
+      
     } catch (error) {
       console.error(`Failed to add optional scope: ${error instanceof Error ? error.message : String(error)}`);
       await cleanupResources(clientScopeId, attributeMapperId, roleMapperId);
@@ -177,56 +177,52 @@ async function manageClientScopes() {
     }
     
     // Step 6: Verify the client has the scope assigned
-    console.log(`\n=== Step 6: Verifying client scope assignment ===`);
+    
     
     let optionalScopes;
     try {
       optionalScopes = await sdk.clients.getOptionalClientScopes(targetClient.id);
-      console.log(`Optional scopes for client ${targetClient.clientId}:`);
+      
       optionalScopes.forEach(scope => {
         console.log(`- ${scope.name} (${scope.id})`);
       });
       
       const assignedScope = optionalScopes.find(scope => scope.id === clientScopeId);
-      if (assignedScope) {
-        console.log(`\nVerified: Client scope ${scopeName} is assigned as optional scope`);
-      } else {
-        console.warn(`\nWarning: Client scope ${scopeName} was not found in optional scopes`);
+      if (!assignedScope) {
+        console.error(`\nError: Client scope ${scopeName} was not found in optional scopes`);
       }
     } catch (error) {
       console.error(`Failed to get optional scopes: ${error instanceof Error ? error.message : String(error)}`);
     }
     
     // Step 7: Move the client scope from optional to default
-    console.log(`\n=== Step 7: Moving client scope from optional to default ===`);
+    
     
     try {
       // First remove from optional scopes
       await sdk.clients.removeOptionalClientScope(targetClient.id, clientScopeId);
-      console.log(`Removed ${scopeName} from optional scopes`);
+      
       
       // Then add to default scopes
       await sdk.clients.addDefaultClientScope(targetClient.id, clientScopeId);
-      console.log(`Added ${scopeName} as default scope to client ${targetClient.clientId}`);
+      
     } catch (error) {
       console.error(`Failed to move scope: ${error instanceof Error ? error.message : String(error)}`);
     }
     
     // Step 8: Verify the client has the scope as default
-    console.log(`\n=== Step 8: Verifying default client scope assignment ===`);
+    
     
     try {
       const defaultScopes = await sdk.clients.getDefaultClientScopes(targetClient.id);
-      console.log(`Default scopes for client ${targetClient.clientId}:`);
+      
       defaultScopes.forEach(scope => {
         console.log(`- ${scope.name} (${scope.id})`);
       });
       
       const defaultAssignedScope = defaultScopes.find(scope => scope.id === clientScopeId);
-      if (defaultAssignedScope) {
-        console.log(`\nVerified: Client scope ${scopeName} is assigned as default scope`);
-      } else {
-        console.warn(`\nWarning: Client scope ${scopeName} was not found in default scopes`);
+      if (!defaultAssignedScope) {
+        console.error(`\nError: Client scope ${scopeName} was not found in default scopes`);
       }
     } catch (error) {
       console.error(`Failed to get default scopes: ${error instanceof Error ? error.message : String(error)}`);
@@ -260,13 +256,13 @@ async function cleanupResources(
       return;
     }
     
-    console.log('\nPerforming cleanup...');
+    
     
     // Delete protocol mappers if they exist
     if (attributeMapperId) {
       try {
         await sdk.clientScopes.deleteProtocolMapper(clientScopeId, attributeMapperId);
-        console.log(`Deleted attribute mapper: ${attributeMapperId}`);
+        
       } catch (error) {
         console.error(`Failed to delete attribute mapper: ${error instanceof Error ? error.message : String(error)}`);
       }
@@ -275,7 +271,7 @@ async function cleanupResources(
     if (roleMapperId) {
       try {
         await sdk.clientScopes.deleteProtocolMapper(clientScopeId, roleMapperId);
-        console.log(`Deleted role mapper: ${roleMapperId}`);
+        
       } catch (error) {
         console.error(`Failed to delete role mapper: ${error instanceof Error ? error.message : String(error)}`);
       }
@@ -284,12 +280,12 @@ async function cleanupResources(
     // Delete the client scope
     try {
       await sdk.clientScopes.delete(clientScopeId);
-      console.log(`Deleted client scope: ${clientScopeId}`);
+      
     } catch (error) {
       console.error(`Failed to delete client scope: ${error instanceof Error ? error.message : String(error)}`);
     }
     
-    console.log('Cleanup completed');
+    
   } catch (error) {
     console.error('Error during cleanup:', error instanceof Error ? error.message : String(error));
   }
@@ -299,19 +295,19 @@ async function cleanupResources(
 manageClientScopes()
   .then(result => {
     if (result.success) {
-      console.log(`\n=== Example completed successfully ===`);
-      console.log(`Resources created:`);
-      console.log(`- Client Scope ID: ${result.clientScopeId}`);
-      console.log(`- Assigned to Client ID: ${result.clientId}`);
-      if (result.attributeMapperId) console.log(`- Attribute Mapper ID: ${result.attributeMapperId}`);
-      if (result.roleMapperId) console.log(`- Role Mapper ID: ${result.roleMapperId}`);
+      
+      
+      
+      
+      if (result.attributeMapperId) 
+      if (result.roleMapperId) 
       
       // Ask if user wants to clean up resources
       console.log(`\nWould you like to clean up the created resources? (yes/no)`);
-      console.log(`If yes, run the following command:`);
+      
       console.log(`node -e "require('./examples/client-scopes/manage-client-scopes').cleanup('${result.clientScopeId}', '${result.attributeMapperId || ''}', '${result.roleMapperId || ''}')"`)
     } else {
-      console.log(`\n=== Example completed with errors ===`);
+      
     }
   })
   .catch(error => {

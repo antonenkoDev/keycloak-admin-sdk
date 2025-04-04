@@ -21,12 +21,10 @@ const sdk = new KeycloakAdminSDK(config);
         const userId = 'some-user-id';
         // Get user representation
         const user: UserRepresentation = await sdk.users.get(userId);
-        console.log('Current user data:', user);
 
         // Update user representation
         const updatedUser: UserRepresentation = { ...user, firstName: 'UpdatedName' };
         await sdk.users.update(userId, updatedUser);
-        console.log('User updated successfully');
     } catch (error) {
         console.error('Error updating user:', error);
     }

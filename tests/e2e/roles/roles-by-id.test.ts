@@ -19,7 +19,7 @@ describe('Roles by ID API E2E Tests', () => {
   const TEST_TIMEOUT = 30000;
 
   beforeAll(async () => {
-    console.log('Setting up test environment for roles-by-id tests');
+    
     
     try {
       // Create test realm
@@ -137,13 +137,12 @@ describe('Roles by ID API E2E Tests', () => {
       // If we get here, the permissions API is supported
       expect(permissions).toBeDefined();
       expect(typeof permissions.enabled).toBe('boolean');
-      console.log('Role permissions management is supported by this Keycloak server version');
+      
     } catch (error) {
       // If the API is not supported, the SDK should handle it gracefully and return a default object
-      // This test should not fail
-      console.warn('Role permissions management is not supported by this Keycloak server version');
       // Skip the test if the feature is not supported
-      expect(true).toBe(true); // Always pass
+      console.warn('Role permissions management is not supported by this Keycloak server version');
+      return; // Skip the test
     }
   });
 
@@ -163,13 +162,12 @@ describe('Roles by ID API E2E Tests', () => {
       // If we get here, the permissions API is supported
       expect(result).toBeDefined();
       expect(result.enabled).toBe(!currentPermissions.enabled);
-      console.log('Role permissions management is supported by this Keycloak server version');
+      
     } catch (error) {
       // If the API is not supported, the SDK should handle it gracefully
-      // This test should not fail
-      console.warn('Role permissions management is not supported by this Keycloak server version');
       // Skip the test if the feature is not supported
-      expect(true).toBe(true); // Always pass
+      console.warn('Role permissions management is not supported by this Keycloak server version');
+      return; // Skip the test
     }
   });
 

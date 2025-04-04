@@ -46,30 +46,29 @@ const sdk = new KeycloakAdminSDK(config);
 async function manageOrganizations() {
   try {
     // Step 1: Create a test organization
-    console.log(`\n=== Step 1: Creating test organization ===`);
+
     const orgName = `test-org-${Date.now()}`;
-    
+
     const organization: OrganizationRepresentation = {
       name: orgName,
-      displayName: `Test Organization ${Date.now()}`,
-      url: 'https://example.com',
-      domains: ['example.com'],
+      redirectUrl: 'https://example.com',
+      domains: [{ name: 'example.com', verified: false }],
       attributes: {
         description: ['A test organization for demonstration purposes']
       }
     };
-    
+
     // Create the organization and get the ID directly from the Location header
     const orgId = await sdk.organizations.create(organization);
-    console.log(`Created organization: ${orgName} with ID: ${orgId}`);
-    
+
+
     // Step 2: Get organization details
-    console.log(`\n=== Step 2: Getting organization details ===`);
+
     const createdOrg = await sdk.organizations.get(orgId);
     console.log(`Organization details:`, JSON.stringify(createdOrg, null, 2));
-    
+
     // Step 3: Create a test user to add as a member
-    console.log(`\n=== Step 3: Creating test user ===`);
+
     const username = `test-user-${Date.now()}`;
     const userId = await sdk.users.create({
       username,
@@ -78,56 +77,46 @@ async function manageOrganizations() {
       firstName: 'Test',
       lastName: 'User'
     });
-    
-    console.log(`Created test user: ${username} with ID: ${userId}`);
-    
+
+
+
     // Step 4: Add user as a member to the organization
-    console.log(`\n=== Step 4: Adding user as organization member ===`);
-    await sdk.organizations.addMember(orgId, userId, ['member']);
-    console.log(`Added user ${username} to organization ${orgName} with role 'member'`);
-    
+
+    await sdk.organizations.addMember(orgId, userId);
+
+
     // Step 5: List organization members
-    console.log(`\n=== Step 5: Listing organization members ===`);
+
     const members = await sdk.organizations.getMembers(orgId);
-    console.log(`Organization has ${members.length} members:`);
+
     members.forEach(member => {
       console.log(`- ${member.username} (${member.id}): Roles: ${member.roles?.join(', ')}`);
     });
-    
-    // Step 6: Update member roles
-    console.log(`\n=== Step 6: Updating member roles ===`);
-    await sdk.organizations.updateMemberRoles(orgId, userId, ['member', 'admin']);
-    console.log(`Updated roles for user ${username} in organization ${orgName}`);
-    
-    // Verify the roles were updated
-    const updatedMembers = await sdk.organizations.getMembers(orgId);
-    const updatedMember = updatedMembers.find(m => m.id === userId);
-    console.log(`Updated roles for ${updatedMember?.username}: ${updatedMember?.roles?.join(', ')}`);
-    
-    // Step 7: List all organizations
-    console.log(`\n=== Step 7: Listing all organizations ===`);
+
+    // Step 6: List all organizations
+
     const allOrgs = await sdk.organizations.list();
-    console.log(`Found ${allOrgs.length} organizations:`);
+
     allOrgs.forEach(org => {
-      console.log(`- ${org.name} (${org.id}): ${org.displayName}`);
+      console.log(`- ${org.name} (${org.id})`);
     });
-    
-    // Step 8: Clean up test resources
-    console.log(`\n=== Step 8: Cleaning up test resources ===`);
-    
+
+    // Step 7: Clean up test resources
+
+
     // Remove user from organization
     await sdk.organizations.removeMember(orgId, userId);
-    console.log(`Removed user ${username} from organization ${orgName}`);
-    
+
+
     // Delete test user
     await sdk.users.delete(userId);
-    console.log(`Deleted test user: ${username}`);
-    
+
+
     // Delete test organization
     await sdk.organizations.delete(orgId);
-    console.log(`Deleted test organization: ${orgName}`);
-    
-    console.log(`\n=== Example completed successfully ===`);
+
+
+
   } catch (error) {
     console.error('Error managing organizations:', error);
     if (error instanceof Error) {

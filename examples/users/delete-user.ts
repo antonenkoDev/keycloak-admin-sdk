@@ -20,7 +20,7 @@ const sdk = new KeycloakAdminSDK(config);
         const userId = 'some-user-id';
         // Delete user
         await sdk.users.delete(userId);
-        console.log('User deleted successfully');
+        
     } catch (error) {
         console.error('Error deleting user:', error);
     }

@@ -86,18 +86,18 @@ function createTestRealmConfig(realmName: string): RealmRepresentation {
 
         // Generate a unique realm name
         const realmName = generateUniqueRealmName();
-        console.log(`Creating test realm: ${realmName}`);
+        
 
         // Create the realm configuration
         const realmConfig = createTestRealmConfig(realmName);
 
         // Create the realm
         await sdk.realms.create(realmConfig);
-        console.log(`Successfully created realm: ${realmName}`);
+        
 
         // Get the created realm to verify
         const createdRealm = await sdk.realms.get(realmName);
-        console.log('Created realm details:');
+        
         console.log(JSON.stringify({
             id: createdRealm.id,
             realm: createdRealm.realm,
@@ -106,15 +106,15 @@ function createTestRealmConfig(realmName: string): RealmRepresentation {
         }, null, 2));
 
         // Create a test client for the realm (this will be implemented in the Clients API)
-        console.log(`\nNext steps:`);
-        console.log(`1. Implement the Clients API to create test clients in the realm`);
-        console.log(`2. Create test users and groups in the realm`);
-        console.log(`3. Run end-to-end tests against the realm`);
-        console.log(`4. Clean up the realm when testing is complete`);
+        
+        
+        
+        
+        
 
         // Uncomment to delete the realm when done
         // await sdk.realms.delete(realmName);
-        // console.log(`Deleted test realm: ${realmName}`);
+        // 
     } catch (error) {
         console.error('Error:', error instanceof Error ? error.message : String(error));
     }

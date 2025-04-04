@@ -19,7 +19,6 @@ const sdk = new KeycloakAdminSDK(config);
         const userId = 'some-user-id';
         // Get configured user storage credential types
         const credentialTypes: string[] = await sdk.users.getUserStorageCredentialTypes(userId);
-        console.log('User storage credential types:', credentialTypes);
     } catch (error) {
         console.error('Error fetching user storage credential types:', error);
     }

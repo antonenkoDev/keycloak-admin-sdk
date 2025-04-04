@@ -15,11 +15,11 @@ import { ClientTypesRepresentation } from "../../src/types/realms";
     // Initialize the SDK
     const sdk = new KeycloakAdminSDK(config);
     
-    console.log('Getting client types...');
+    
     
     // Get client types
     const clientTypes = await sdk.realms.getClientTypes(config.realm);
-    console.log('Current client types:');
+    
     console.log(JSON.stringify(clientTypes, null, 2));
     
     // Create or update client types
@@ -44,22 +44,22 @@ import { ClientTypesRepresentation } from "../../src/types/realms";
         ]
       };
       
-      console.log('Updating client types...');
+      
       await sdk.realms.updateClientTypes(config.realm, updatedClientTypes);
-      console.log('Client types updated successfully');
+      
       
       // Get updated client types to verify changes
       const updatedClientTypesResult = await sdk.realms.getClientTypes(config.realm);
-      console.log('Updated client types:');
+      
       console.log(JSON.stringify(updatedClientTypesResult, null, 2));
     } else {
-      console.log('No realm-specific client types found to update');
+      
     }
     
     // Get client session stats
-    console.log('Getting client session stats...');
+    
     const sessionStats = await sdk.realms.getClientSessionStats(config.realm);
-    console.log('Client session stats:');
+    
     console.log(JSON.stringify(sessionStats, null, 2));
     
   } catch (error) {

@@ -77,18 +77,18 @@ export class GroupsApi {
             const result = await this.sdk.request<{id: string}>(endpoint, 'POST', group);
             
             if (result && result.id) {
-                console.log(`Created group with ID: ${result.id}`);
+                
                 return result.id;
             }
             
             // Fallback to finding the group by name if the ID wasn't extracted from the Location header
             if (group.name) {
-                console.log('ID not found in response, falling back to finding group by name');
+                
                 const groups = await this.list({ search: group.name });
                 const createdGroup = groups.find(g => g.name === group.name);
                 
                 if (createdGroup && createdGroup.id) {
-                    console.log(`Found group with ID: ${createdGroup.id}`);
+                    
                     return createdGroup.id;
                 }
             }

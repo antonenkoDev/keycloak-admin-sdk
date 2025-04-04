@@ -39,8 +39,7 @@ async function createOrganizationalStructure(): Promise<void> {
         };
         
         await sdk.groups.create(companyGroup);
-        console.log('Created top-level Company group');
-        
+
         // Find the Company group to get its ID
         const groups = await sdk.groups.list();
         const companyGroupObj = groups.find(g => g.name === 'Company');
@@ -76,7 +75,7 @@ async function createOrganizationalStructure(): Promise<void> {
         
         for (const dept of departments) {
             await sdk.groups.createChild(companyGroupId, dept);
-            console.log(`Created ${dept.name} department group`);
+            
         }
         
         // Get updated company group with subgroups
@@ -114,7 +113,7 @@ async function createOrganizationalStructure(): Promise<void> {
             
             for (const team of engineeringTeams) {
                 await sdk.groups.createChild(departmentIds['Engineering'], team);
-                console.log(`Created ${team.name} team under Engineering`);
+                
             }
         }
         
@@ -133,11 +132,11 @@ async function createOrganizationalStructure(): Promise<void> {
             
             for (const team of marketingTeams) {
                 await sdk.groups.createChild(departmentIds['Marketing'], team);
-                console.log(`Created ${team.name} team under Marketing`);
+                
             }
         }
         
-        console.log('\nSuccessfully created organizational structure!');
+        
     } catch (error) {
         console.error('Error creating organizational structure:', 
             error instanceof Error ? error.message : String(error));
@@ -156,13 +155,13 @@ async function displayGroupHierarchy(): Promise<void> {
             populateHierarchy: true
         });
         
-        console.log('\n=== Group Hierarchy ===\n');
+        
         
         // Display groups in a tree-like structure
         function printGroup(group: GroupRepresentation, level: number = 0): void {
             const indent = '  '.repeat(level);
             const prefix = level > 0 ? '└─ ' : '';
-            console.log(`${indent}${prefix}${group.name || 'Unnamed Group'}`);
+            
             
             // Print attributes if they exist
             if (group.attributes && Object.keys(group.attributes).length > 0) {
@@ -225,9 +224,9 @@ async function cleanupOrganizationalStructure(): Promise<void> {
         if (companyGroup && companyGroup.id) {
             // Delete the Company group (this will delete all subgroups as well)
             await sdk.groups.delete(companyGroup.id);
-            console.log('Deleted Company group and all its subgroups');
+            
         } else {
-            console.log('Company group not found, nothing to delete');
+            
         }
     } catch (error) {
         console.error('Error cleaning up organizational structure:', 
@@ -243,7 +242,7 @@ async function cleanupOrganizationalStructure(): Promise<void> {
         const companyExists = existingGroups.some(g => g.name === 'Company');
         
         if (companyExists) {
-            console.log('Company group already exists. Cleaning up before creating new structure...');
+            
             await cleanupOrganizationalStructure();
         }
         
@@ -265,7 +264,7 @@ async function cleanupOrganizationalStructure(): Promise<void> {
                 const engineeringGroup = updatedCompanyGroup.subGroups.find(g => g.name === 'Engineering');
                 
                 if (engineeringGroup && engineeringGroup.id) {
-                    console.log('\nSetting permissions for Engineering group:');
+                    
                     await setGroupPermissions(engineeringGroup.id);
                 }
             }

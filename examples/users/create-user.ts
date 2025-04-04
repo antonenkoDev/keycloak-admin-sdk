@@ -25,7 +25,6 @@ const sdk = new KeycloakAdminSDK(config);
         };
 
         const createdUser = await sdk.users.create(newUser);
-        console.log(createdUser);
     } catch (error) {
         console.error('Error creating user:', error);
     }

@@ -20,7 +20,7 @@ const sdk = new KeycloakAdminSDK(config);
     try {
         // Get user profile configuration
         const profileConfig: UPConfig = await sdk.users.getUserProfileConfig();
-        console.log(profileConfig);
+        
     } catch (error) {
         console.error('Error fetching user profile config:', error);
     }

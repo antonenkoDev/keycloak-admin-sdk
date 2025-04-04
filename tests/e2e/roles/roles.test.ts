@@ -23,8 +23,6 @@ describe('Roles API E2E Tests', () => {
 
   // Set up test environment before running tests
   beforeAll(async () => {
-    console.log('Setting up test environment for roles tests');
-    
     try {
       // Create test realm
       testContext = await setupTestEnvironment();
@@ -33,7 +31,10 @@ describe('Roles API E2E Tests', () => {
       // Create a test user for role assignment tests
       const user = await createTestUser(sdk);
       userId = user.id || '';
-      console.log(`Created test user with ID: ${userId}`);
+      
+      if (!userId) {
+        throw new Error('Failed to create test user: no ID returned');
+      }
     } catch (error) {
       console.error('Error setting up test environment:', error);
       throw error;
@@ -45,7 +46,6 @@ describe('Roles API E2E Tests', () => {
     try {
       // Clean up test resources
       if (userId) {
-        console.log(`Cleaning up test user: ${userId}`);
         await sdk.users.delete(userId);
       }
       
@@ -53,18 +53,16 @@ describe('Roles API E2E Tests', () => {
       if (compositeRoleName) {
         try {
           await sdk.roles.delete(compositeRoleName);
-          console.log(`Cleaned up composite role: ${compositeRoleName}`);
         } catch (error) {
-          console.warn(`Failed to delete composite role: ${error instanceof Error ? error.message : String(error)}`);
+          console.error(`Failed to delete composite role: ${error instanceof Error ? error.message : String(error)}`);
         }
       }
       
       if (roleName) {
         try {
           await sdk.roles.delete(roleName);
-          console.log(`Cleaned up role: ${roleName}`);
         } catch (error) {
-          console.warn(`Failed to delete role: ${error instanceof Error ? error.message : String(error)}`);
+          console.error(`Failed to delete role: ${error instanceof Error ? error.message : String(error)}`);
         }
       }
       
@@ -96,7 +94,6 @@ describe('Roles API E2E Tests', () => {
       
       // Create the role and get the ID
       roleId = await sdk.roles.create(role);
-      console.log(`Created role with ID: ${roleId}`);
       
       // Verify ID is valid
       expect(roleId).toBeDefined();
@@ -124,14 +121,14 @@ describe('Roles API E2E Tests', () => {
   test('should list roles with filtering', async () => {
     // Skip test if no role was created
     if (!roleName) {
-      console.warn('Role name not available - skipping test');
+      throw new Error('Role name not available');
       return;
     }
     
     try {
       // List all roles
       const allRoles = await sdk.roles.list();
-      console.log(`Found ${allRoles.length} roles`);
+      
       
       // Verify our test role is in the list
       const hasRole = allRoles.some(role => role.id === roleId);
@@ -158,7 +155,7 @@ describe('Roles API E2E Tests', () => {
   test('should update a role', async () => {
     // Skip test if no role was created
     if (!roleName) {
-      console.warn('Role name not available - skipping test');
+      throw new Error('Role name not available');
       return;
     }
     
@@ -178,7 +175,7 @@ describe('Roles API E2E Tests', () => {
       
       // Update the role
       await sdk.roles.update(roleName, role);
-      console.log(`Updated role: ${roleName}`);
+      
       
       // Verify update was successful
       const updatedRole = await sdk.roles.getByName(roleName);
@@ -198,7 +195,7 @@ describe('Roles API E2E Tests', () => {
   test('should create a composite role and add composites', async () => {
     // Skip test if no role was created
     if (!roleName) {
-      console.warn('Role name not available - skipping test');
+      throw new Error('Role name not available');
       return;
     }
     
@@ -215,14 +212,14 @@ describe('Roles API E2E Tests', () => {
       
       // Create the composite role and get the ID
       compositeRoleId = await sdk.roles.create(compositeRole);
-      console.log(`Created composite role with ID: ${compositeRoleId}`);
+      
       
       // Get the original role
       const role = await sdk.roles.getByName(roleName);
       
       // Add the original role as a composite
       await sdk.roles.addComposites(compositeRoleName, [role]);
-      console.log(`Added ${roleName} as a composite to ${compositeRoleName}`);
+      
       
       // Verify composite was added
       const composites = await sdk.roles.getComposites(compositeRoleName);
@@ -244,19 +241,19 @@ describe('Roles API E2E Tests', () => {
   test('should get role composites', async () => {
     // Skip test if no composite role was created
     if (!compositeRoleName) {
-      console.warn('Composite role name not available - skipping test');
+      throw new Error('Composite role name not available');
       return;
     }
     
     try {
       // Get all composites
       const composites = await sdk.roles.getComposites(compositeRoleName);
-      console.log(`Composite role has ${composites.length} composites`);
+      
       expect(composites.length).toBeGreaterThan(0);
       
       // Get realm role composites
       const realmComposites = await sdk.roles.getRealmRoleComposites(compositeRoleName);
-      console.log(`Composite role has ${realmComposites.length} realm composites`);
+      
       expect(realmComposites.length).toBeGreaterThan(0);
       
       // Verify our test role is in the composites
@@ -276,7 +273,7 @@ describe('Roles API E2E Tests', () => {
   test('should assign a role to a user and get users with role', async () => {
     // Skip test if no role or user was created
     if (!roleName || !userId) {
-      console.warn('Role name or User ID not available - skipping test');
+      throw new Error('Role name or User ID not available');
       return;
     }
     
@@ -286,7 +283,7 @@ describe('Roles API E2E Tests', () => {
       
       // Add role to user
       await sdk.users.addRealmRoles(userId, [role]);
-      console.log(`Added role ${roleName} to user with ID: ${userId}`);
+      
       
       // Verify role was added to user
       const userRoles = await sdk.users.getRealmRoleMappings(userId);
@@ -295,7 +292,7 @@ describe('Roles API E2E Tests', () => {
       
       // Get users with the role
       const usersWithRole = await sdk.roles.getUsersWithRole(roleName);
-      console.log(`Role ${roleName} has ${usersWithRole.length} users`);
+      
       
       // Verify our test user is in the list
       const hasUser = usersWithRole.some(user => user.id === userId);
@@ -314,7 +311,7 @@ describe('Roles API E2E Tests', () => {
   test('should remove composites from a role', async () => {
     // Skip test if no composite role was created
     if (!compositeRoleName || !roleName) {
-      console.warn('Composite role name or role name not available - skipping test');
+      throw new Error('Composite role name or role name not available');
       return;
     }
     
@@ -324,7 +321,7 @@ describe('Roles API E2E Tests', () => {
       
       // Remove the original role from composites
       await sdk.roles.removeComposites(compositeRoleName, [role]);
-      console.log(`Removed ${roleName} from composites of ${compositeRoleName}`);
+      
       
       // Verify composite was removed
       const composites = await sdk.roles.getComposites(compositeRoleName);
@@ -344,7 +341,7 @@ describe('Roles API E2E Tests', () => {
   test('should delete roles', async () => {
     // Skip test if no roles were created
     if (!roleName || !compositeRoleName) {
-      console.warn('Role names not available - skipping test');
+      throw new Error('Role names not available');
       return;
     }
     
@@ -354,15 +351,15 @@ describe('Roles API E2E Tests', () => {
         try {
           const role = await sdk.roles.getByName(roleName);
           await sdk.users.removeRealmRoles(userId, [role]);
-          console.log(`Removed role ${roleName} from user with ID: ${userId}`);
+          
         } catch (error) {
-          console.warn(`Error removing role from user: ${error instanceof Error ? error.message : String(error)}`);
+          console.error(`Error removing role from user: ${error instanceof Error ? error.message : String(error)}`);
         }
       }
       
       // Delete the composite role
       await sdk.roles.delete(compositeRoleName);
-      console.log(`Deleted composite role: ${compositeRoleName}`);
+      
       
       // Verify composite role was deleted
       try {
@@ -376,7 +373,7 @@ describe('Roles API E2E Tests', () => {
       
       // Delete the original role
       await sdk.roles.delete(roleName);
-      console.log(`Deleted role: ${roleName}`);
+      
       
       // Verify role was deleted
       try {

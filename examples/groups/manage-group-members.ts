@@ -46,12 +46,12 @@ async function displayGroupMembers(groupId: string, groupName: string): Promise<
     console.log(`\n=== Members of '${groupName}' group (${members.length}) ===`);
     
     if (members.length === 0) {
-        console.log('No members found in this group.');
+        
         return;
     }
     
     // Display members in a formatted table-like output
-    console.log('ID\t\t\t\tUsername\t\tEmail\t\t\tFirst Name\tLast Name');
+    
     console.log('-'.repeat(100));
     
     members.forEach(member => {
@@ -72,7 +72,7 @@ async function displayGroupMembers(groupId: string, groupName: string): Promise<
         const group = await findGroupByName(groupName);
         
         if (!group || !group.id) {
-            console.log(`Group '${groupName}' not found. Please create it first.`);
+            
             return;
         }
         
@@ -86,7 +86,7 @@ async function displayGroupMembers(groupId: string, groupName: string): Promise<
             max: 5
         });
         
-        console.log(`\nFound ${potentialMembers.length} potential members to add to the group:`);
+        
         potentialMembers.forEach(user => {
             console.log(`- ${user.username} (${user.email || 'No email'})`);
         });
@@ -99,19 +99,19 @@ async function displayGroupMembers(groupId: string, groupName: string): Promise<
             // In the actual user-groups API, we would add the user to the group
             // This is using the user-centric API from the existing GroupsApi in your SDK
             await sdk.users.groups.add(userId, group.id);
-            console.log(`\nAdded user '${username}' to the '${groupName}' group`);
+            
             
             // Display updated members
             await displayGroupMembers(group.id, groupName);
             
             // Remove the user from the group
             await sdk.users.groups.remove(userId, group.id);
-            console.log(`\nRemoved user '${username}' from the '${groupName}' group`);
+            
             
             // Display final members list
             await displayGroupMembers(group.id, groupName);
         } else {
-            console.log('\nNo potential members found to add to the group.');
+            
         }
     } catch (error) {
         console.error('Error:', error instanceof Error ? error.message : String(error));

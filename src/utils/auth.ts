@@ -40,22 +40,18 @@ function isErrorResponse(data: unknown): data is ErrorResponse {
 export async function getToken(config: KeycloakConfig): Promise<string> {
     // For bearer token authentication, just return the token
     if (config.authMethod === 'bearer') {
-        console.log('Using bearer token authentication');
         return (config.credentials as BearerCredentials).token;
     }
 
     // For client credentials or password authentication, get a token from Keycloak
     const tokenUrl = `${config.baseUrl}/realms/${config.realm}/protocol/openid-connect/token`;
-    console.log(`Getting token from: ${tokenUrl}`);
-    console.log(`Authentication method: ${config.authMethod}`);
-    
+
     const headers = { 'Content-Type': 'application/x-www-form-urlencoded' };
     let body: URLSearchParams;
 
     // Prepare the request body based on the authentication method
     if (config.authMethod === 'client') {
         const { clientId, clientSecret } = config.credentials as ClientCredentials;
-        console.log(`Using client credentials authentication with client ID: ${clientId}`);
         body = new URLSearchParams({
             grant_type: 'client_credentials',
             client_id: clientId,
@@ -63,7 +59,6 @@ export async function getToken(config: KeycloakConfig): Promise<string> {
         });
     } else if (config.authMethod === 'password') {
         const { username, password, clientId } = config.credentials as PasswordCredentials;
-        console.log(`Using password authentication with username: ${username} and client ID: ${clientId}`);
         body = new URLSearchParams({
             grant_type: 'password',
             client_id: clientId,
@@ -103,7 +98,6 @@ export async function getToken(config: KeycloakConfig): Promise<string> {
 
         // Validate the token response
         if (isTokenResponse(data)) {
-            console.log('Successfully obtained token');
             return data.access_token;
         } else {
             console.error('Invalid token response:', data);

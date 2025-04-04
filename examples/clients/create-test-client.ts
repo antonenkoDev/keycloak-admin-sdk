@@ -41,7 +41,7 @@ async function createTestRealmAndClient() {
     const realmName = `test-realm-${Date.now()}`;
     const uniqueClientId = generateUniqueClientId();
     
-    console.log(`Creating test realm: ${realmName}`);
+    
     
     // Create a test realm
     const realm: RealmRepresentation = {
@@ -65,7 +65,7 @@ async function createTestRealmAndClient() {
     
     // Create the realm
     await sdk.realms.create(realm);
-    console.log(`Realm "${realmName}" created successfully`);
+    
     
     // Create a test client
     const client: ClientRepresentation = {
@@ -94,17 +94,17 @@ async function createTestRealmAndClient() {
     
     // Create the client in the new realm
     const createdClientId = await sdk.clients.create(client);
-    console.log(`Client created successfully with ID: ${createdClientId}`);
+    
     
     // Get the client secret
     const clientSecret = await sdk.clients.getClientSecret(createdClientId);
-    console.log(`Client secret: ${clientSecret.value}`);
     
-    console.log('\nTest realm and client created successfully!');
-    console.log(`Realm: ${realmName}`);
-    console.log(`Client ID: ${client.clientId}`);
-    console.log(`Client Secret: ${clientSecret.value}`);
-    console.log('\nYou can now use these for your end-to-end tests.');
+    
+    
+    
+    
+    
+    
     
   } catch (error) {
     console.error('Error creating test realm and client:', error);

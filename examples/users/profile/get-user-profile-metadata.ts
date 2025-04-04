@@ -18,8 +18,7 @@ const sdk = new KeycloakAdminSDK(config);
 (async () => {
     try {
         // Get user profile metadata
-        const profileMetadata: UserProfileMetadata = await sdk.users.getUserProfileMetadata();
-        console.log(profileMetadata);
+        await sdk.users.getUserProfileMetadata();
     } catch (error) {
         console.error('Error fetching user profile metadata:', error);
     }

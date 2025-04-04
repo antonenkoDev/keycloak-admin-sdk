@@ -16,7 +16,6 @@ const sdk = new KeycloakAdminSDK(config);
 (async () => {
     try {
         const users = await sdk.users.list({ enabled: true, max: 10 });
-        console.log(users);
     } catch (error) {
         console.error('Error fetching users:', error);
     }

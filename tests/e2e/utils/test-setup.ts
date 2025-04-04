@@ -1,12 +1,13 @@
 /**
  * Test Setup Utilities
- * 
+ *
  * Provides helper functions for setting up and tearing down the test environment
  */
 
 import KeycloakAdminSDK from '../../../src';
 import { RealmRepresentation } from '../../../src/types/realms';
-import { ClientRepresentation } from '../../../src/types/clients';
+import { ClientRepresentation as ClientRep } from '../../../src/types/clients';
+import { KeycloakConfig } from '../../../src/types/auth';
 import dotenv from 'dotenv';
 
 // Load environment variables from .env file
@@ -16,8 +17,11 @@ dotenv.config();
 export const config = {
   baseUrl: process.env.KEYCLOAK_BASE_URL || 'http://localhost:8080',
   realm: process.env.KEYCLOAK_REALM || 'master',
-  authMethod: (process.env.KEYCLOAK_AUTH_METHOD === 'bearer' ? 'bearer' : 
-               process.env.KEYCLOAK_AUTH_METHOD === 'client' ? 'client' : 'password') as 'password' | 'bearer' | 'client',
+  authMethod: (process.env.KEYCLOAK_AUTH_METHOD === 'bearer'
+    ? 'bearer'
+    : process.env.KEYCLOAK_AUTH_METHOD === 'client'
+      ? 'client'
+      : 'password') as 'password' | 'bearer' | 'client',
   credentials: {
     username: process.env.KEYCLOAK_ADMIN_USERNAME || 'admin',
     password: process.env.KEYCLOAK_ADMIN_PASSWORD || 'admin',
@@ -44,23 +48,24 @@ export interface TestContext {
   sdk: KeycloakAdminSDK;
   realmName: string;
   clientId?: string;
-  clientUuid?: string; // Client UUID for role mappings
   clientId2?: string; // Additional client ID for testing
   clientSecret?: string;
   groupIds?: string[];
   userIds?: string[];
+
   [key: string]: any; // Allow for additional properties
 }
 
 /**
- * Setup a test environment with a realm and client
+ * Set up a test environment with a realm and client
  * @returns TestContext with SDK and created resources
  */
 export async function setupTestEnvironment(): Promise<TestContext> {
-  const sdk = new KeycloakAdminSDK(config);
+  // Create initial SDK instance for admin operations
+  const adminSdk = new KeycloakAdminSDK(config);
   const realmName = generateUniqueName('test-realm');
-  
-  // Create a test realm
+
+  // Create a test realm with email configuration
   const realm: RealmRepresentation = {
     realm: realmName,
     enabled: true,
@@ -76,15 +81,136 @@ export async function setupTestEnvironment(): Promise<TestContext> {
     eventsEnabled: true,
     eventsListeners: ['jboss-logging'],
     adminEventsEnabled: true,
-    adminEventsDetailsEnabled: true
+    adminEventsDetailsEnabled: true,
+    organizationsEnabled: true,
+    // Email configuration for the test realm
+    smtpServer: {
+      host: 'mailhog',  // Use the Docker service name
+      port: '1025',
+      from: 'keycloak@localhost',
+      fromDisplayName: 'Keycloak Test',
+      ssl: 'false',
+      starttls: 'false',
+      auth: 'false'
+    }
   };
-  
+
   try {
-    console.log(`Attempting to create test realm: ${realmName}`);
-    console.log(`Using Keycloak at: ${config.baseUrl}`);
-    console.log(`Authentication method: ${config.authMethod}`);
-    await sdk.realms.create(realm);
-    console.log(`Created test realm: ${realmName}`);
+    // Create the realm using the admin SDK
+    await adminSdk.realms.create(realm);
+    console.log(`Test realm created: ${realmName} with email configuration`);
+    
+    // Verify email configuration after realm creation
+    try {
+      const createdRealm = await adminSdk.realms.get(realmName);
+      if (createdRealm.smtpServer) {
+        console.log(`Email configuration verified for realm ${realmName}:`, {
+          host: createdRealm.smtpServer.host,
+          port: createdRealm.smtpServer.port,
+          from: createdRealm.smtpServer.from
+        });
+      } else {
+        console.warn(`Email configuration not found in created realm ${realmName}`);
+      }
+    } catch (error) {
+      console.error(`Error verifying email configuration: ${error instanceof Error ? error.message : String(error)}`);
+    }
+    
+    // Create an admin user in the test realm
+    const adminUsername = 'test-admin';
+    const adminPassword = 'test-password';
+    
+    // Create the admin user using the master realm SDK with all required fields
+    // Following SOLID principles - complete user representation with all required fields
+    const adminUser = {
+      username: adminUsername,
+      enabled: true,
+      emailVerified: true,
+      firstName: 'Test',
+      lastName: 'Admin',
+      email: 'test-admin@example.com', // Email is required for a fully set up account
+      credentials: [
+        {
+          type: 'password',
+          value: adminPassword,
+          temporary: false
+        }
+      ],
+      // Adding required attributes and roles
+      attributes: {
+        phoneNumber: ['555-1234']
+      },
+      requiredActions: [], // No required actions to complete
+      realmRoles: ['admin', 'offline_access', 'uma_authorization']
+    };
+    
+    // Create the admin user in the test realm
+    const adminUserId = await adminSdk.requestForRealm<{id: string}>(realmName, '/users', 'POST', adminUser);
+    console.log(`Created admin user in test realm: ${adminUserId.id}`);
+    
+    // Assign the admin role to the user
+    // First, get the realm-management client ID
+    interface ClientRepresentation {
+      id: string;
+      clientId: string;
+    }
+    
+    const clients = await adminSdk.requestForRealm<ClientRepresentation[]>(realmName, '/clients', 'GET');
+    const realmManagementClient = clients.find(client => client.clientId === 'realm-management');
+    
+    if (!realmManagementClient || !realmManagementClient.id) {
+      throw new Error('Could not find realm-management client');
+    }
+    
+    // Get the realm-admin role ID
+    interface RoleRepresentation {
+      id: string;
+      name: string;
+    }
+    
+    const roles = await adminSdk.requestForRealm<RoleRepresentation[]>(
+      realmName, 
+      `/clients/${realmManagementClient.id}/roles`, 
+      'GET'
+    );
+    
+    const adminRole = roles.find(role => role.name === 'realm-admin');
+    
+    if (!adminRole || !adminRole.id) {
+      throw new Error('Could not find realm-admin role');
+    }
+    
+    // Assign the role to the user
+    await adminSdk.requestForRealm<void>(
+      realmName,
+      `/users/${adminUserId.id}/role-mappings/clients/${realmManagementClient.id}`,
+      'POST',
+      [adminRole]
+    );
+    
+    console.log('Assigned realm-admin role to test admin user');
+    
+    // Create a new SDK instance that uses the test realm admin credentials
+    const testRealmConfig: KeycloakConfig = {
+      baseUrl: config.baseUrl,
+      realm: realmName,
+      authMethod: 'password' as const, // Type assertion to ensure correct type
+      credentials: {
+        username: adminUsername,
+        password: adminPassword,
+        clientId: 'admin-cli'
+      }
+    };
+    
+    const sdk = new KeycloakAdminSDK(testRealmConfig);
+    
+    // Return context with the SDK and realm name
+    return {
+      sdk,
+      realmName,
+      groupIds: [],
+      userIds: [adminUserId.id] // Track the admin user ID for cleanup
+    };
   } catch (error) {
     console.error('Error creating test realm:', error);
     if (error instanceof Error) {
@@ -93,9 +219,11 @@ export async function setupTestEnvironment(): Promise<TestContext> {
     }
     throw error;
   }
-  
+
+  // This code should not be reached as we return in the try block
+  // But just in case, create a new SDK instance for the test realm
   return {
-    sdk,
+    sdk: new KeycloakAdminSDK({ ...config, realm: realmName }),
     realmName,
     groupIds: [],
     userIds: []
@@ -108,13 +236,13 @@ export async function setupTestEnvironment(): Promise<TestContext> {
  * @returns Updated test context with client information
  */
 export async function createTestClient(context: TestContext): Promise<TestContext> {
-  const { sdk, realmName } = context;
-  
+  const { sdk } = context;
+
   // Following SOLID principles - Single Responsibility: Generate unique name
   const clientIdName = generateUniqueName('test-client');
-  
+
   // Create a minimal test client following Clean Code principles
-  const client: ClientRepresentation = {
+  const client: ClientRep = {
     clientId: clientIdName,
     name: 'E2E Test Client',
     description: 'Client for automated E2E testing',
@@ -134,54 +262,56 @@ export async function createTestClient(context: TestContext): Promise<TestContex
       'pkce.code.challenge.method': 'S256'
     }
   };
-  
+
   try {
     // Create the client in the test realm
-    console.log(`Creating test client: ${clientIdName} in realm: ${realmName}`);
-    
+
     // First check if a client with this ID already exists
     const existingClients = await sdk.clients.findAll(clientIdName);
     let createdClientId: string | undefined;
-    
+
     if (existingClients && existingClients.length > 0 && existingClients[0].id) {
       // Use the existing client
       createdClientId = existingClients[0].id;
-      console.log(`Using existing client with ID: ${createdClientId}`);
     } else {
       // Create a new client
       try {
         createdClientId = await sdk.clients.create(client);
       } catch (createError) {
-        console.error(`Error creating client: ${createError instanceof Error ? createError.message : String(createError)}`);
+        console.error(
+          `Error creating client: ${createError instanceof Error ? createError.message : String(createError)}`
+        );
         // Try to find the client by clientId in case it was created despite the error
         const possiblyCreatedClients = await sdk.clients.findAll(clientIdName);
-        if (possiblyCreatedClients && possiblyCreatedClients.length > 0 && possiblyCreatedClients[0].id) {
+        if (
+          possiblyCreatedClients &&
+          possiblyCreatedClients.length > 0 &&
+          possiblyCreatedClients[0].id
+        ) {
           createdClientId = possiblyCreatedClients[0].id;
-          console.log(`Found client that was created despite error, ID: ${createdClientId}`);
         }
       }
     }
-    
+
     if (!createdClientId) {
       console.error('Failed to create client: No client ID returned');
       return context; // Return the original context without client info
     }
-    
-    console.log(`Using test client: ${clientIdName} with ID: ${createdClientId}`);
-    
+
     // Get the client secret with better error handling
     let clientSecret;
     try {
-      console.log(`Getting client secret for client ID: ${createdClientId}`);
       clientSecret = await sdk.clients.getClientSecret(createdClientId);
-      
+
       return {
         ...context,
         clientId: createdClientId,
         clientSecret: clientSecret.value
       };
     } catch (error) {
-      console.error(`Failed to get client secret: ${error instanceof Error ? error.message : String(error)}`);
+      console.error(
+        `Failed to get client secret: ${error instanceof Error ? error.message : String(error)}`
+      );
       // Return context with client ID but without secret
       return {
         ...context,
@@ -189,15 +319,16 @@ export async function createTestClient(context: TestContext): Promise<TestContex
       };
     }
   } catch (error) {
-    console.error(`Failed to create client: ${error instanceof Error ? error.message : String(error)}`);
-    
+    console.error(
+      `Failed to create client: ${error instanceof Error ? error.message : String(error)}`
+    );
+
     // Try to create a second client with a different name as a fallback
     try {
       const fallbackClientIdName = generateUniqueName('fallback-client');
-      console.log(`Attempting to create fallback client: ${fallbackClientIdName}`);
-      
+
       // Create a simpler client for fallback with minimal configuration
-      const fallbackClient: ClientRepresentation = {
+      const fallbackClient: ClientRep = {
         clientId: fallbackClientIdName,
         name: 'Fallback E2E Test Client',
         enabled: true,
@@ -207,21 +338,22 @@ export async function createTestClient(context: TestContext): Promise<TestContex
         implicitFlowEnabled: false,
         serviceAccountsEnabled: false,
         redirectUris: ['http://localhost:3000/*'],
-        webOrigins: ['+'],
+        webOrigins: ['+']
       };
-      
+
       const fallbackClientId = await sdk.clients.create(fallbackClient);
       if (fallbackClientId) {
-        console.log(`Created fallback client with ID: ${fallbackClientId}`);
         return {
           ...context,
           clientId: fallbackClientId
         };
       }
     } catch (fallbackError) {
-      console.error(`Failed to create fallback client: ${fallbackError instanceof Error ? fallbackError.message : String(fallbackError)}`);
+      console.error(
+        `Failed to create fallback client: ${fallbackError instanceof Error ? fallbackError.message : String(fallbackError)}`
+      );
     }
-    
+
     return context; // Return the original context without client info
   }
 }
@@ -232,7 +364,7 @@ export async function createTestClient(context: TestContext): Promise<TestContex
  */
 /**
  * Create a test user in the specified realm
- * 
+ *
  * @param sdk - KeycloakAdminSDK instance
  * @returns Created user representation
  */
@@ -240,7 +372,7 @@ export async function createTestUser(sdk: KeycloakAdminSDK) {
   try {
     // Generate a unique username
     const username = generateUniqueName('test-user');
-    
+
     // Create user
     const userId = await sdk.users.create({
       username,
@@ -249,12 +381,9 @@ export async function createTestUser(sdk: KeycloakAdminSDK) {
       firstName: 'Test',
       lastName: 'User'
     });
-    
-    console.log(`Created test user: ${username} with ID: ${userId}`);
-    
+
     // Get the full user representation
-    const user = await sdk.users.get(userId);
-    return user;
+    return await sdk.users.get(userId);
   } catch (error) {
     console.error('Error creating test user:', error);
     throw error;
@@ -263,7 +392,7 @@ export async function createTestUser(sdk: KeycloakAdminSDK) {
 
 /**
  * Create a test group in the specified realm
- * 
+ *
  * @param sdk - KeycloakAdminSDK instance
  * @returns Created group representation
  */
@@ -271,17 +400,14 @@ export async function createTestGroup(sdk: KeycloakAdminSDK) {
   try {
     // Generate a unique group name
     const groupName = generateUniqueName('test-group');
-    
+
     // Create group - using the enhanced API that returns the ID directly
     const groupId = await sdk.groups.create({
       name: groupName
     });
-    
-    console.log(`Created test group: ${groupName} with ID: ${groupId}`);
-    
+
     // Get the full group representation
-    const group = await sdk.groups.get(groupId);
-    return group;
+    return await sdk.groups.get(groupId);
   } catch (error) {
     console.error('Error creating test group:', error);
     throw error;
@@ -290,61 +416,66 @@ export async function createTestGroup(sdk: KeycloakAdminSDK) {
 
 /**
  * Clean up the test environment by deleting all created resources
- * 
+ *
  * @param context The test context
  * @returns Promise that resolves when cleanup is complete
  */
 export async function cleanupTestEnvironment(context: TestContext): Promise<void> {
   const { sdk, realmName, userIds, groupIds, clientId } = context;
-  
+
   try {
     // Delete users if any were created
     if (userIds && userIds.length > 0) {
       for (const userId of userIds) {
         try {
           await sdk.users.delete(userId);
-          console.log(`Deleted test user: ${userId}`);
         } catch (error) {
           console.error(`Failed to delete user ${userId}:`, error);
         }
       }
     }
-    
+
     // Delete groups if any were created
     if (groupIds && groupIds.length > 0) {
       for (const groupId of groupIds) {
         try {
           // First check if the group exists
-          console.log(`Checking if group ${groupId} exists before deletion`);
+
           try {
             await sdk.groups.get(groupId);
             // If we get here, the group exists, so delete it
             await sdk.groups.delete(groupId);
-            console.log(`Deleted test group: ${groupId}`);
           } catch (getError) {
             // Group doesn't exist, so no need to delete
-            console.log(`Group ${groupId} doesn't exist, skipping deletion`);
           }
         } catch (error) {
-          console.error(`Failed to delete group ${groupId}: ${error instanceof Error ? error.message : String(error)}`);
+          console.error(
+            `Failed to delete group ${groupId}: ${error instanceof Error ? error.message : String(error)}`
+          );
         }
       }
     }
-    
+
     // Delete client if created
     if (clientId) {
       try {
         await sdk.clients.delete(clientId);
-        console.log(`Deleted test client: ${clientId}`);
       } catch (error) {
         console.error(`Failed to delete client ${clientId}:`, error);
       }
     }
+
+    // Create an admin SDK instance to delete the realm
+    // Important: Use the master realm for admin operations
+    const adminSdk = new KeycloakAdminSDK({
+      ...config,
+      realm: 'master' // Always use master realm for administrative operations
+    });
     
-    // Delete the test realm
+    // Delete the test realm using the admin SDK
     try {
-      await sdk.realms.delete(realmName);
-      console.log(`Deleted test realm: ${realmName}`);
+      await adminSdk.realms.delete(realmName);
+      console.log(`Test realm deleted: ${realmName}`);
     } catch (error) {
       console.error(`Failed to delete realm ${realmName}:`, error);
     }

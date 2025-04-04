@@ -21,7 +21,7 @@ const sdk = new KeycloakAdminSDK(config);
         const userId = 'some-user-id';
         // Get user representation
         const user: UserRepresentation = await sdk.users.get(userId, { userProfileMetadata: true });
-        console.log(user);
+        
     } catch (error) {
         console.error('Error fetching user:', error);
     }

@@ -1,0 +1,22 @@
+version: '3'
+
+services:
+  keycloak:
+    image: quay.io/keycloak/keycloak:latest
+    environment:
+      - KEYCLOAK_ADMIN=admin
+      - KEYCLOAK_ADMIN_PASSWORD=admin
+      - KC_HOSTNAME=localhost
+      - KC_SPI_EMAIL_SMTP_HOST=mailhog
+      - KC_SPI_EMAIL_SMTP_PORT=1025
+      - KC_SPI_EMAIL_FROM=keycloak@localhost
+      - KC_SPI_EMAIL_FROM_DISPLAY_NAME=Keycloak
+    ports:
+      - "8080:8080"
+    command: start-dev
+
+  mailhog:
+    image: mailhog/mailhog
+    ports:
+      - "1025:1025" # SMTP port
+      - "8025:8025" # Web interface

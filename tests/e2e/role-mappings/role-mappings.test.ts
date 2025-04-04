@@ -26,7 +26,7 @@ describe('Role Mappings API E2E Tests', () => {
 
   // Set up test environment before running tests
   beforeAll(async () => {
-    console.log('Setting up test environment for role mappings tests');
+    
     
     try {
       // Create test realm
@@ -50,7 +50,7 @@ describe('Role Mappings API E2E Tests', () => {
       };
       
       userId = await sdk.users.create(testUser);
-      console.log(`Created test user with ID: ${userId}`);
+      
       
       // Create a test group
       const testGroup: GroupRepresentation = {
@@ -58,7 +58,7 @@ describe('Role Mappings API E2E Tests', () => {
       };
       
       groupId = await sdk.groups.create(testGroup);
-      console.log(`Created test group with ID: ${groupId}`);
+      
       
       // Create test roles
       const testRole1: RoleRepresentation = {
@@ -73,11 +73,11 @@ describe('Role Mappings API E2E Tests', () => {
       
       role1Id = await sdk.roles.create(testRole1);
       role2Id = await sdk.roles.create(testRole2);
-      console.log(`Created test roles with IDs: ${role1Id}, ${role2Id}`);
+      
       
       // Get the created roles
-      role1 = await sdk.roles.getById(role1Id);
-      role2 = await sdk.roles.getById(role2Id);
+      role1 = await sdk.roles.byId.get(role1Id);
+      role2 = await sdk.roles.byId.get(role2Id);
     } catch (error) {
       console.error('Error setting up test environment:', error);
       throw error;
@@ -89,22 +89,22 @@ describe('Role Mappings API E2E Tests', () => {
     try {
       // Clean up test resources
       if (role1Id && role1.name) {
-        console.log(`Cleaning up test role: ${role1.name}`);
+        
         await sdk.roles.delete(role1.name);
       }
       
       if (role2Id && role2.name) {
-        console.log(`Cleaning up test role: ${role2.name}`);
+        
         await sdk.roles.delete(role2.name);
       }
       
       if (groupId) {
-        console.log(`Cleaning up test group: ${groupId}`);
+        
         await sdk.groups.delete(groupId);
       }
       
       if (userId) {
-        console.log(`Cleaning up test user: ${userId}`);
+        
         await sdk.users.delete(userId);
       }
       
@@ -290,7 +290,7 @@ describe('Role Mappings API E2E Tests', () => {
               clientRole = clientRoles[0];
               console.log(`Using client role: ${clientRole.name} (${clientRole.id})`);
             } else {
-              console.log('No client roles available, creating a test client role');
+              
               
               // Create a test client role
               const testClientRole: RoleRepresentation = {
@@ -303,10 +303,10 @@ describe('Role Mappings API E2E Tests', () => {
               console.log(`Created test client role: ${clientRole.name} (${clientRole.id})`);
             }
           } else {
-            console.log('No suitable client found for client role mappings tests');
+            
           }
         } else {
-          console.log('No clients available for client role mappings tests');
+          
         }
       } catch (error) {
         console.error('Error setting up client role mappings tests:', error);
@@ -317,7 +317,7 @@ describe('Role Mappings API E2E Tests', () => {
       try {
         // Clean up test client role if we created one
         if (clientId && clientRole && clientRole.name && clientRole.name.startsWith('test-client-role-')) {
-          console.log(`Cleaning up test client role: ${clientRole.name}`);
+          
           await sdk.clients.deleteRole(clientId, clientRole.name);
         }
       } catch (error) {
@@ -328,7 +328,7 @@ describe('Role Mappings API E2E Tests', () => {
     test('should get available client role mappings for a user', async () => {
       // Skip test if no client or client role is available
       if (!clientId || !clientRole) {
-        console.log('Skipping client role mappings test - no client or client role available');
+        
         return;
       }
       
@@ -345,7 +345,7 @@ describe('Role Mappings API E2E Tests', () => {
     test('should add client role mappings to a user', async () => {
       // Skip test if no client or client role is available
       if (!clientId || !clientRole) {
-        console.log('Skipping client role mappings test - no client or client role available');
+        
         return;
       }
       
@@ -367,7 +367,7 @@ describe('Role Mappings API E2E Tests', () => {
     test('should get effective client role mappings for a user', async () => {
       // Skip test if no client or client role is available
       if (!clientId || !clientRole) {
-        console.log('Skipping client role mappings test - no client or client role available');
+        
         return;
       }
       
@@ -383,7 +383,7 @@ describe('Role Mappings API E2E Tests', () => {
     test('should delete client role mappings from a user', async () => {
       // Skip test if no client or client role is available
       if (!clientId || !clientRole) {
-        console.log('Skipping client role mappings test - no client or client role available');
+        
         return;
       }
       

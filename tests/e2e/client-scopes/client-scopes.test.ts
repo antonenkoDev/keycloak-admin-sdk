@@ -16,18 +16,14 @@ describe('Client Scopes API E2E Tests', () => {
   // Setup test environment before all tests
   beforeAll(async () => {
     try {
-      console.log('Setting up test environment for client scopes tests');
       testContext = await setupTestEnvironment();
       
       // Create test client to ensure we have a valid realm
-      console.log('Creating test client for client scopes tests');
       testContext = await createTestClient(testContext);
       
       // Verify that client was created successfully
       if (!testContext.clientId) {
-        console.warn('Test client was not created properly, some tests may fail');
-      } else {
-        console.log(`Test client created with ID: ${testContext.clientId}`);
+        throw new Error('Test client was not created properly');
       }
     } catch (error) {
       console.error(`Error in test setup: ${error instanceof Error ? error.message : String(error)}`);
@@ -41,7 +37,6 @@ describe('Client Scopes API E2E Tests', () => {
       // Clean up test client scope if it was created
       if (testClientScopeId) {
         try {
-          console.log(`Cleaning up test client scope: ${testClientScopeId}`);
           await testContext.sdk.clientScopes.delete(testClientScopeId);
         } catch (error) {
           console.error(`Error deleting test client scope: ${error instanceof Error ? error.message : String(error)}`);
@@ -61,16 +56,12 @@ describe('Client Scopes API E2E Tests', () => {
   test('should find all client scopes in a realm', async () => {
     try {
       // Find all client scopes in the test realm
-      console.log('Finding all client scopes in the test realm');
       const clientScopes = await testContext.sdk.clientScopes.findAll();
       
       // Verify that client scopes were found
       expect(clientScopes).toBeDefined();
       expect(Array.isArray(clientScopes)).toBe(true);
       expect(clientScopes.length).toBeGreaterThan(0);
-      
-      // Log the number of client scopes found for debugging
-      console.log(`Found ${clientScopes.length} client scopes`);
     } catch (error) {
       console.error(`Error finding client scopes: ${error instanceof Error ? error.message : String(error)}`);
       throw error;
@@ -84,7 +75,6 @@ describe('Client Scopes API E2E Tests', () => {
     try {
       // Create a client scope for testing
       const clientScopeName = generateUniqueName('test-scope');
-      console.log(`Creating test client scope: ${clientScopeName}`);
       
       const clientScope: ClientScopeRepresentation = {
         name: clientScopeName,
@@ -98,7 +88,6 @@ describe('Client Scopes API E2E Tests', () => {
       
       // Create the client scope
       testClientScopeId = await testContext.sdk.clientScopes.create(clientScope);
-      console.log(`Test client scope created with ID: ${testClientScopeId}`);
       
       // Verify the client scope was created
       expect(testClientScopeId).toBeDefined();
@@ -117,7 +106,7 @@ describe('Client Scopes API E2E Tests', () => {
         expect(retrievedScope.attributes['display.on.consent.screen']).toBe('true');
         expect(retrievedScope.attributes['include.in.token.scope']).toBe('true');
       } else {
-        console.warn('Client scope attributes not returned by Keycloak API, skipping attribute verification');
+        throw new Error('Client scope attributes not returned by Keycloak API');
       }
     } catch (error) {
       console.error(`Error creating client scope: ${error instanceof Error ? error.message : String(error)}`);
@@ -131,13 +120,12 @@ describe('Client Scopes API E2E Tests', () => {
   test('should find a client scope by ID', async () => {
     // Skip test if no client scope ID is available
     if (!testClientScopeId) {
-      console.warn('Skipping test: Test client scope ID is not defined');
-      return;
+      throw new Error('Test client scope ID is not defined');
     }
     
     try {
       // Find the client scope by ID
-      console.log(`Finding client scope by ID: ${testClientScopeId}`);
+      
       const clientScope = await testContext.sdk.clientScopes.findById(testClientScopeId);
       
       // Verify the client scope properties
@@ -157,13 +145,13 @@ describe('Client Scopes API E2E Tests', () => {
   test('should update a client scope', async () => {
     // Skip test if no client scope ID is available
     if (!testClientScopeId) {
-      console.warn('Skipping test: Test client scope ID is not defined');
+      throw new Error('Test client scope ID is not defined');
       return;
     }
     
     try {
       // Get the current client scope
-      console.log(`Getting client scope for update: ${testClientScopeId}`);
+      
       const clientScope = await testContext.sdk.clientScopes.findById(testClientScopeId);
       
       // Following SOLID principles, create a minimal update payload
@@ -181,11 +169,11 @@ describe('Client Scopes API E2E Tests', () => {
       };
       
       // Update the client scope
-      console.log(`Updating client scope: ${testClientScopeId}`);
+      
       await testContext.sdk.clientScopes.update(testClientScopeId, updatedClientScope);
       
       // Get the updated client scope
-      console.log(`Getting updated client scope: ${testClientScopeId}`);
+      
       const retrievedClientScope = await testContext.sdk.clientScopes.findById(testClientScopeId);
       
       // Verify the updates with proper error handling
@@ -197,7 +185,7 @@ describe('Client Scopes API E2E Tests', () => {
       if (retrievedClientScope.attributes) {
         expect(retrievedClientScope.attributes['testAttribute']).toBe('test-value');
       } else {
-        console.warn('Client scope attributes not returned by Keycloak API, skipping attribute verification');
+        throw new Error('Client scope attributes not returned by Keycloak API');
       }
     } catch (error) {
       console.error(`Error updating client scope: ${error instanceof Error ? error.message : String(error)}`);
@@ -211,14 +199,13 @@ describe('Client Scopes API E2E Tests', () => {
   test('should create a protocol mapper for a client scope', async () => {
     // Skip test if no client scope ID is available
     if (!testClientScopeId) {
-      console.warn('Skipping test: Test client scope ID is not defined');
-      return;
+      throw new Error('Test client scope ID is not defined');
     }
     
     try {
       // Create a protocol mapper
       const mapperName = generateUniqueName('test-mapper');
-      console.log(`Creating protocol mapper ${mapperName} for client scope: ${testClientScopeId}`);
+      
       
       const protocolMapper: ProtocolMapperRepresentation = {
         name: mapperName,
@@ -237,7 +224,7 @@ describe('Client Scopes API E2E Tests', () => {
       
       // Create the protocol mapper
       testProtocolMapperId = await testContext.sdk.clientScopes.createProtocolMapper(testClientScopeId, protocolMapper);
-      console.log(`Protocol mapper created with ID: ${testProtocolMapperId}`);
+      
       
       // Verify the protocol mapper was created
       expect(testProtocolMapperId).toBeDefined();
@@ -264,13 +251,13 @@ describe('Client Scopes API E2E Tests', () => {
   test('should get a protocol mapper by ID', async () => {
     // Skip test if no client scope ID or protocol mapper ID is available
     if (!testClientScopeId || !testProtocolMapperId) {
-      console.warn('Skipping test: Test client scope ID or protocol mapper ID is not defined');
+      throw new Error('Test client scope ID or protocol mapper ID is not defined');
       return;
     }
     
     try {
       // Get the protocol mapper by ID
-      console.log(`Getting protocol mapper by ID: ${testProtocolMapperId}`);
+      
       const protocolMapper = await testContext.sdk.clientScopes.getProtocolMapper(testClientScopeId, testProtocolMapperId);
       
       // Verify the protocol mapper properties
@@ -284,7 +271,7 @@ describe('Client Scopes API E2E Tests', () => {
         expect(protocolMapper.config['user.attribute']).toBe('email');
         expect(protocolMapper.config['claim.name']).toBe('email');
       } else {
-        console.warn('Protocol mapper config not returned by Keycloak API, skipping config verification');
+        throw new Error('Protocol mapper config not returned by Keycloak API');
       }
     } catch (error) {
       console.error(`Error getting protocol mapper by ID: ${error instanceof Error ? error.message : String(error)}`);
@@ -298,13 +285,12 @@ describe('Client Scopes API E2E Tests', () => {
   test('should update a protocol mapper', async () => {
     // Skip test if no client scope ID or protocol mapper ID is available
     if (!testClientScopeId || !testProtocolMapperId) {
-      console.warn('Skipping test: Test client scope ID or protocol mapper ID is not defined');
-      return;
+      throw new Error('Test client scope ID or protocol mapper ID is not defined');
     }
     
     try {
       // Get the current protocol mapper
-      console.log(`Getting protocol mapper for update: ${testProtocolMapperId}`);
+      
       const protocolMapper = await testContext.sdk.clientScopes.getProtocolMapper(testClientScopeId, testProtocolMapperId);
       
       // Following SOLID principles, create a minimal update payload
@@ -321,11 +307,11 @@ describe('Client Scopes API E2E Tests', () => {
       };
       
       // Update the protocol mapper
-      console.log(`Updating protocol mapper: ${testProtocolMapperId}`);
+      
       await testContext.sdk.clientScopes.updateProtocolMapper(testClientScopeId, testProtocolMapperId, updatedMapper);
       
       // Get the updated protocol mapper
-      console.log(`Getting updated protocol mapper: ${testProtocolMapperId}`);
+      
       const retrievedMapper = await testContext.sdk.clientScopes.getProtocolMapper(testClientScopeId, testProtocolMapperId);
       
       // Verify the updates with proper error handling
@@ -336,7 +322,7 @@ describe('Client Scopes API E2E Tests', () => {
         expect(retrievedMapper.config['user.attribute']).toBe('username');
         expect(retrievedMapper.config['claim.name']).toBe('preferred_username');
       } else {
-        console.warn('Protocol mapper config not returned by Keycloak API, skipping config verification');
+        throw new Error('Protocol mapper config not returned by Keycloak API');
       }
     } catch (error) {
       console.error(`Error updating protocol mapper: ${error instanceof Error ? error.message : String(error)}`);
@@ -350,13 +336,13 @@ describe('Client Scopes API E2E Tests', () => {
   test('should delete a protocol mapper', async () => {
     // Skip test if no client scope ID or protocol mapper ID is available
     if (!testClientScopeId || !testProtocolMapperId) {
-      console.warn('Skipping test: Test client scope ID or protocol mapper ID is not defined');
+      throw new Error('Test client scope ID or protocol mapper ID is not defined');
       return;
     }
     
     try {
       // Delete the protocol mapper
-      console.log(`Deleting protocol mapper: ${testProtocolMapperId}`);
+      
       await testContext.sdk.clientScopes.deleteProtocolMapper(testClientScopeId, testProtocolMapperId);
       
       // Get the protocol mappers for the client scope
@@ -383,14 +369,13 @@ describe('Client Scopes API E2E Tests', () => {
   test('should delete a client scope', async () => {
     // Skip test if no client scope ID is available
     if (!testClientScopeId) {
-      console.warn('Skipping test: Test client scope ID is not defined');
-      return;
+      throw new Error('Test client scope ID is not defined');
     }
     
     try {
       // Create a new client scope specifically for deletion testing
       const clientScopeName = generateUniqueName('delete-test-scope');
-      console.log(`Creating client scope for deletion test: ${clientScopeName}`);
+      
       
       const clientScope: ClientScopeRepresentation = {
         name: clientScopeName,
@@ -400,13 +385,13 @@ describe('Client Scopes API E2E Tests', () => {
       
       // Create the client scope
       const deleteTestScopeId = await testContext.sdk.clientScopes.create(clientScope);
-      console.log(`Created client scope for deletion test with ID: ${deleteTestScopeId}`);
+      
       
       // Verify the client scope was created
       expect(deleteTestScopeId).toBeDefined();
       
       // Delete the client scope
-      console.log(`Deleting client scope: ${deleteTestScopeId}`);
+      
       await testContext.sdk.clientScopes.delete(deleteTestScopeId);
       
       // Try to get the deleted client scope - should throw an error
@@ -416,7 +401,7 @@ describe('Client Scopes API E2E Tests', () => {
         fail('Client scope was not deleted');
       } catch (error) {
         // Expected error - client scope should be deleted
-        console.log('Client scope was successfully deleted');
+        
       }
     } catch (error) {
       console.error(`Error in client scope deletion test: ${error instanceof Error ? error.message : String(error)}`);

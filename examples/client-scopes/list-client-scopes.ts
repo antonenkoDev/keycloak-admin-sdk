@@ -32,21 +32,21 @@ const sdk = new KeycloakAdminSDK(config);
 async function listClientScopes() {
   try {
     // Get all client scopes
-    console.log('Fetching all client scopes...');
+    
     const clientScopes = await sdk.clientScopes.findAll();
     
     // Display the client scopes
-    console.log(`Found ${clientScopes.length} client scopes:`);
+    
     clientScopes.forEach(scope => {
       console.log(`- ${scope.name} (${scope.id})`);
-      console.log(`  Description: ${scope.description || 'N/A'}`);
-      console.log(`  Protocol: ${scope.protocol || 'N/A'}`);
+      
+      
       
       // Display attributes if available
       if (scope.attributes && Object.keys(scope.attributes).length > 0) {
-        console.log('  Attributes:');
+        
         Object.entries(scope.attributes).forEach(([key, value]) => {
-          console.log(`    ${key}: ${value}`);
+          
         });
       }
       
@@ -58,7 +58,7 @@ async function listClientScopes() {
         });
       }
       
-      console.log(''); // Empty line for better readability
+       // Empty line for better readability
     });
   } catch (error) {
     console.error('Error listing client scopes:', error);

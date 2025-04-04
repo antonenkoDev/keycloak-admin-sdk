@@ -30,7 +30,7 @@ const sdk = new KeycloakAdminSDK(config);
         
         // Count all groups
         const count = await sdk.groups.count();
-        console.log('Total groups count:', count);
+        
         
         // If there are groups, get details of the first one
         if (groups.length > 0) {

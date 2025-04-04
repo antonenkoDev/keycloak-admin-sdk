@@ -41,7 +41,7 @@ describe('Realms API E2E Tests', () => {
   test('should update a realm', async () => {
     try {
       // Get the current realm
-      console.log(`Getting realm: ${testContext.realmName} for update`);
+      
       const realm = await testContext.sdk.realms.get(testContext.realmName);
       
       // Create a minimal update payload with just the required fields
@@ -53,13 +53,13 @@ describe('Realms API E2E Tests', () => {
         enabled: realm.enabled
       };
       
-      console.log(`Updating realm: ${testContext.realmName} with new display name`);
+      
       
       // Update the realm
       await testContext.sdk.realms.update(testContext.realmName, updatedRealm);
       
       // Get the updated realm
-      console.log(`Getting updated realm: ${testContext.realmName}`);
+      
       const retrievedRealm = await testContext.sdk.realms.get(testContext.realmName);
       
       // Verify the updates
@@ -82,7 +82,7 @@ describe('Realms API E2E Tests', () => {
       
       // If the display name hasn't been updated yet, update it
       if (currentRealm.displayName !== 'Updated E2E Test Realm') {
-        console.log('Updating realm display name before list test');
+        
         await testContext.sdk.realms.update(testContext.realmName, {
           id: currentRealm.id,
           realm: currentRealm.realm,
@@ -92,7 +92,7 @@ describe('Realms API E2E Tests', () => {
       }
       
       // List all realms
-      console.log('Listing all realms');
+      
       const realms = await testContext.sdk.realms.list();
       
       // Verify that the list contains our test realm
@@ -105,7 +105,7 @@ describe('Realms API E2E Tests', () => {
       // Verify the display name, but with more flexibility
       // This is more robust as it handles potential race conditions in test execution
       if (testRealm?.displayName !== 'Updated E2E Test Realm') {
-        console.log(`Warning: Expected display name 'Updated E2E Test Realm' but got '${testRealm?.displayName}'`);
+        
         // Still expect the realm to be found, but don't fail on display name
       } else {
         expect(testRealm?.displayName).toBe('Updated E2E Test Realm');
@@ -193,7 +193,7 @@ describe('Realms API E2E Tests', () => {
     
     // If the display name hasn't been updated yet, update it
     if (currentRealm.displayName !== 'Updated E2E Test Realm') {
-      console.log('Updating realm display name before export test');
+      
       await testContext.sdk.realms.update(testContext.realmName, {
         ...currentRealm,
         displayName: 'Updated E2E Test Realm'

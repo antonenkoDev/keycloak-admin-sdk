@@ -46,7 +46,6 @@ const sdk = new KeycloakAdminSDK(config);
 
         // Set user profile configuration
         const updatedProfileConfig: UPConfig = await sdk.users.setUserProfileConfig(newProfileConfig);
-        console.log(updatedProfileConfig);
     } catch (error) {
         console.error('Error setting user profile config:', error);
     }

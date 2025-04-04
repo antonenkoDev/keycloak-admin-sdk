@@ -41,7 +41,7 @@ async function findGroupByName(name: string): Promise<GroupRepresentation | unde
         const group = await findGroupByName(groupName);
         
         if (!group || !group.id) {
-            console.log(`Group '${groupName}' not found. Please create it first.`);
+            
             return;
         }
         
@@ -65,7 +65,7 @@ async function findGroupByName(name: string): Promise<GroupRepresentation | unde
         
         // Update the group
         await sdk.groups.update(group.id, updatedGroup);
-        console.log(`Group '${groupName}' updated successfully`);
+        
         
         // Get the updated group to verify changes
         const verifyGroup = await sdk.groups.get(group.id);
