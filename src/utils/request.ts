@@ -56,7 +56,6 @@ export async function makeRequest<T>(
     // Handle unsuccessful responses
     if (!response.ok) {
       const errorText = await response.text().catch(() => 'No response body');
-      console.error(`Request failed with status ${response.status}: ${errorText}`);
       throw new RequestError(response.status, response.statusText, errorText);
     }
 

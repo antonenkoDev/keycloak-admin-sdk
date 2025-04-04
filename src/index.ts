@@ -14,6 +14,8 @@ import { IdentityProvidersApi } from './api/identity-providers/identity-provider
 import { RolesApi } from './api/roles/roles';
 import { RoleMappingsApiFactory } from './api/role-mappings';
 import { ScopeMappingsApiFactory } from './api/scope-mappings';
+import { KeysApi } from './api/keys';
+import { ResourceServerApi } from './api/authorization';
 import { KeycloakConfig } from './types/auth';
 import { getToken } from './utils/auth';
 import { HttpMethod, makeRequest } from './utils/request';
@@ -39,6 +41,8 @@ class KeycloakAdminSDK {
   public roles: RolesApi;
   public roleMappings: RoleMappingsApiFactory;
   public scopeMappings: ScopeMappingsApiFactory;
+  public keys: KeysApi;
+  public resourceServer: ResourceServerApi;
 
   /**
    * Creates a new instance of the Keycloak Admin SDK
@@ -62,6 +66,8 @@ class KeycloakAdminSDK {
     this.roles = new RolesApi(this);
     this.roleMappings = new RoleMappingsApiFactory(this);
     this.scopeMappings = new ScopeMappingsApiFactory(this);
+    this.keys = new KeysApi(this);
+    this.resourceServer = new ResourceServerApi(this);
   }
 
   /**

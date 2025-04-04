@@ -10,6 +10,7 @@ import { IdentityProviderRepresentation } from '../../../src/types/identity-prov
 import { IdentityProviderMapperRepresentation } from '../../../src/types/identity-provider-mappers';
 import {
   cleanupTestEnvironment,
+  createTestClient,
   generateUniqueName,
   setupTestEnvironment,
   TestContext
@@ -30,9 +31,9 @@ describe('Identity Providers API E2E Tests', () => {
       // Create test realm
       testContext = await setupTestEnvironment();
       sdk = testContext.sdk;
+      testContext = await createTestClient(testContext);
 
       // Log the SDK configuration for debugging
-      console.log(`Using test realm: ${testContext.realmName}`);
     } catch (error) {
       console.error('Error setting up test environment:', error);
       throw error;
@@ -209,7 +210,9 @@ describe('Identity Providers API E2E Tests', () => {
         let mapperTypes: Record<string, any> = {};
         try {
           mapperTypes = await sdk.identityProviders.getMapperTypes(testProviderAlias);
-          console.log(`Retrieved ${Object.keys(mapperTypes).length} mapper types for provider ${testProviderAlias}`);
+          console.log(
+            `Retrieved ${Object.keys(mapperTypes).length} mapper types for provider ${testProviderAlias}`
+          );
           expect(mapperTypes).toBeDefined();
           expect(typeof mapperTypes).toBe('object');
         } catch (error) {
@@ -242,7 +245,6 @@ describe('Identity Providers API E2E Tests', () => {
           const mapperKey = usernameMapperKey || oidcMapperKey || firstMapperKey;
           if (mapperKey && mapperTypes[mapperKey] && mapperTypes[mapperKey].id) {
             mapperTypeId = mapperTypes[mapperKey].id;
-            console.log(`Using mapper type: ${mapperKey} with ID: ${mapperTypeId}`);
           } else {
             console.warn(`Could not find a valid mapper type ID, using default: ${mapperTypeId}`);
           }
@@ -262,22 +264,19 @@ describe('Identity Providers API E2E Tests', () => {
           }
         };
 
-        console.log(`Creating mapper with name: ${mapperName} and type: ${mapperTypeId}`);
         testMapperId = await sdk.identityProviders.createMapper(testProviderAlias, mapper);
-        console.log(`Created mapper with ID: ${testMapperId}`);
+
         expect(testMapperId).toBeDefined();
 
         // Get all mappers
         let mappers;
         try {
           mappers = await sdk.identityProviders.getMappers(testProviderAlias);
-          console.log(`Retrieved ${mappers.length} mappers`);
+
           expect(Array.isArray(mappers)).toBe(true);
 
           // Log all mapper IDs and names for debugging
-          mappers.forEach(m => {
-            console.log(`Mapper: ID=${m.id}, Name=${m.name}`);
-          });
+          mappers.forEach(m => {});
 
           // The mapper ID might be the name or an actual ID
           const hasTestMapper = mappers.some(
@@ -288,7 +287,6 @@ describe('Identity Providers API E2E Tests', () => {
           );
 
           if (hasTestMapper) {
-            console.log('Successfully found the created mapper in the list');
           } else {
             console.warn(
               `Mapper not found in list. Created ID: ${testMapperId}, Name: ${mapperName}`
@@ -304,7 +302,6 @@ describe('Identity Providers API E2E Tests', () => {
         // Get the specific mapper
         let createdMapper;
         try {
-          console.log(`Attempting to get mapper with ID: ${testMapperId}`);
           createdMapper = await sdk.identityProviders.getMapper(testProviderAlias, testMapperId);
           console.log(`Successfully retrieved mapper: ${JSON.stringify(createdMapper)}`);
           expect(createdMapper.name).toBe(mapperName);
@@ -328,9 +325,7 @@ describe('Identity Providers API E2E Tests', () => {
             }
           };
 
-          console.log(`Updating mapper to name: ${updatedName}`);
           await sdk.identityProviders.updateMapper(testProviderAlias, testMapperId, updatedMapper);
-          console.log('Mapper update successful');
 
           // Get the updated mapper
           const retrievedMapper = await sdk.identityProviders.getMapper(
@@ -350,9 +345,7 @@ describe('Identity Providers API E2E Tests', () => {
 
         // Delete the mapper
         try {
-          console.log(`Deleting mapper with ID: ${testMapperId}`);
           await sdk.identityProviders.deleteMapper(testProviderAlias, testMapperId);
-          console.log('Mapper deletion successful');
 
           // Verify the mapper was deleted
           try {

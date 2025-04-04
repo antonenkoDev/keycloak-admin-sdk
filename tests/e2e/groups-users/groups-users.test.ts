@@ -352,7 +352,7 @@ describe('Groups and Users API E2E Tests', () => {
     } catch (error) {
       // Expected error, user was deleted
       userWasDeleted = true;
-      console.log('Expected error, user was deleted');
+
       expect(error).toBeDefined();
     }
 
@@ -386,7 +386,7 @@ describe('Groups and Users API E2E Tests', () => {
     } catch (error) {
       // Expected error, group was deleted
       groupWasDeleted = true;
-      console.log('Expected error, group was deleted');
+
       expect(error).toBeDefined();
     }
 

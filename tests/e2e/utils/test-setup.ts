@@ -110,17 +110,11 @@ export async function setupTestEnvironment(): Promise<TestContext> {
   try {
     // Create the realm using the admin SDK
     await adminSdk.realms.create(realm);
-    console.log(`Test realm created: ${realmName} with email configuration`);
 
     // Verify email configuration after realm creation
     try {
       const createdRealm = await adminSdk.realms.get(realmName);
       if (createdRealm.smtpServer) {
-        console.log(`Email configuration verified for realm ${realmName}:`, {
-          host: createdRealm.smtpServer.host,
-          port: createdRealm.smtpServer.port,
-          from: createdRealm.smtpServer.from
-        });
       } else {
         console.warn(`Email configuration not found in created realm ${realmName}`);
       }
@@ -176,19 +170,6 @@ export async function setupTestEnvironment(): Promise<TestContext> {
       'POST',
       adminUser
     );
-    console.log(`Created admin user in test realm: ${adminUserId.id}`);
-
-    // Enable permissions for the realm
-    try {
-      await adminSdk.requestForRealm(
-        realmName,
-        '/management/permissions',
-        'PUT',
-        { enabled: true }
-      );
-    } catch (error) {
-      console.error(`Error enabling realm permissions: ${error instanceof Error ? error.message : String(error)}`);
-    }
 
     // Assign the admin role to the user
     // First, get the realm-management client ID
@@ -233,8 +214,6 @@ export async function setupTestEnvironment(): Promise<TestContext> {
       'POST',
       [adminRole]
     );
-
-    console.log('Assigned realm-admin role to test admin user');
 
     // Create a new SDK instance that uses the test realm admin credentials
     const testRealmConfig: KeycloakConfig = {
@@ -299,7 +278,7 @@ export async function createTestClient(context: TestContext): Promise<TestContex
     standardFlowEnabled: true,
     implicitFlowEnabled: false,
     directAccessGrantsEnabled: true,
-    authorizationServicesEnabled: false,
+    authorizationServicesEnabled: true,
     redirectUris: ['http://localhost:3000/*'],
     webOrigins: ['+'],
     defaultClientScopes: ['web-origins', 'profile', 'roles', 'email'],
@@ -383,6 +362,7 @@ export async function createTestClient(context: TestContext): Promise<TestContex
         standardFlowEnabled: true,
         implicitFlowEnabled: false,
         serviceAccountsEnabled: false,
+        authorizationServicesEnabled: true,
         redirectUris: ['http://localhost:3000/*'],
         webOrigins: ['+']
       };
@@ -506,9 +486,7 @@ export async function cleanupTestEnvironment(context: TestContext): Promise<void
     if (clientId) {
       try {
         await sdk.clients.delete(clientId);
-      } catch (error) {
-        console.error(`Failed to delete client ${clientId}:`, error);
-      }
+      } catch (error) {}
     }
 
     // Create an admin SDK instance to delete the realm
@@ -521,7 +499,6 @@ export async function cleanupTestEnvironment(context: TestContext): Promise<void
     // Delete the test realm using the admin SDK
     try {
       await adminSdk.realms.delete(realmName);
-      console.log(`Test realm deleted: ${realmName}`);
     } catch (error) {
       console.error(`Failed to delete realm ${realmName}:`, error);
     }

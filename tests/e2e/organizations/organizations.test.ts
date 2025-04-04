@@ -42,7 +42,6 @@ describe('Organizations API E2E Tests', () => {
       sdk = testContext.sdk;
 
       // Log the SDK configuration for debugging
-      console.log(`Using test realm: ${testContext.realmName}`);
 
       const organizationRepresentation: OrganizationRepresentation = {
         name: 'TestOrganization',
