@@ -41,7 +41,6 @@ describe('Authorization Resource Server API', () => {
       try {
         // Get the resource server configuration to verify it exists
         await sdk.resourceServer.getResourceServer(clientId);
-        console.log('Resource server is properly configured');
       } catch (error) {
         console.error('Error verifying resource server configuration:', error);
         console.error('Make sure authorization services are enabled for the client');
@@ -83,9 +82,10 @@ describe('Authorization Resource Server API', () => {
   describe('Resource Management', () => {
     let resourceId: string;
     const testResource: ResourceRepresentation = {
-      name: 'Test Resource',
+      name: 'TestResource',
       displayName: 'Test Resource Display Name',
-      type: 'urn:test:resource',
+      ownerManagedAccess: false,
+      type: '',
       uris: ['/api/test'],
       scopes: [],
       attributes: {
@@ -100,9 +100,9 @@ describe('Authorization Resource Server API', () => {
         const resources = await sdk.resourceServer.getResources(clientId);
         if (Array.isArray(resources)) {
           const existingResource = resources.find(r => r.name === testResource.name);
-          if (existingResource && existingResource.id) {
+          if (existingResource && existingResource._id) {
             console.log(`Found existing resource with name ${testResource.name}, cleaning up...`);
-            await sdk.resourceServer.deleteResource(clientId, existingResource.id);
+            await sdk.resourceServer.deleteResource(clientId, existingResource._id);
           }
         }
       } catch (error) {
@@ -114,11 +114,8 @@ describe('Authorization Resource Server API', () => {
     it('should create a resource', async () => {
       try {
         // Create a resource
-        await sdk.resourceServer.createResource(clientId, testResource);
-
-        // No response body expected. Test is passed if no errors.
-
-        expect(true).toBe(true);
+        const resource = await sdk.resourceServer.createResource(clientId, testResource);
+        resourceId = resource._id;
       } catch (error) {
         console.error('Error creating resource:', error);
         throw error;
@@ -128,8 +125,7 @@ describe('Authorization Resource Server API', () => {
     it('should get resources', async () => {
       // Skip if resource ID is not defined
       if (!resourceId) {
-        console.warn('Resource ID not defined, skipping test');
-        return;
+        throw new Error('Resource ID not defined');
       }
 
       try {
@@ -147,11 +143,11 @@ describe('Authorization Resource Server API', () => {
         if (Array.isArray(resources)) {
           // Type assertion to ensure TypeScript knows resources is an array of ResourceRepresentation
           const typedResources = resources as ResourceRepresentation[];
-          testResourceInList = typedResources.find(r => r.id === resourceId);
+          testResourceInList = typedResources.find(r => r._id === resourceId);
         } else if (resources && typeof resources === 'object' && 'id' in resources) {
           // Type assertion for a single ResourceRepresentation
           const typedResource = resources as ResourceRepresentation;
-          testResourceInList = typedResource.id === resourceId ? typedResource : undefined;
+          testResourceInList = typedResource._id === resourceId ? typedResource : undefined;
         }
 
         expect(testResourceInList).toBeDefined();
@@ -167,8 +163,7 @@ describe('Authorization Resource Server API', () => {
     it('should get a specific resource', async () => {
       // Skip if resource ID is not defined
       if (!resourceId) {
-        console.warn('Resource ID not defined, skipping test');
-        return;
+        throw new Error('Resource ID not defined');
       }
 
       try {
@@ -177,7 +172,7 @@ describe('Authorization Resource Server API', () => {
 
         // Verify resource was retrieved correctly
         expect(resource).toBeDefined();
-        expect(resource.id).toBe(resourceId);
+        expect(resource._id).toBe(resourceId);
         expect(resource.name).toBe(testResource.name);
         expect(resource.displayName).toBe(testResource.displayName);
       } catch (error) {
@@ -189,15 +184,14 @@ describe('Authorization Resource Server API', () => {
     it('should update a resource', async () => {
       // Skip if resource ID is not defined
       if (!resourceId) {
-        console.warn('Resource ID not defined, skipping test');
-        return;
+        throw new Error('Resource ID not defined');
       }
 
       try {
         // Update the resource
         const updatedResource: ResourceRepresentation = {
           ...testResource,
-          id: resourceId,
+          _id: resourceId,
           displayName: 'Updated Display Name',
           uris: ['/api/test', '/api/test2']
         };
@@ -220,8 +214,7 @@ describe('Authorization Resource Server API', () => {
     it('should search for a resource by name', async () => {
       // Skip if resource name is not defined
       if (!testResource.name) {
-        console.warn('Resource name not defined, skipping test');
-        return;
+        throw new Error('Resource Name not defined');
       }
 
       try {
@@ -239,8 +232,7 @@ describe('Authorization Resource Server API', () => {
     it('should get resource attributes', async () => {
       // Skip if resource ID is not defined
       if (!resourceId) {
-        console.warn('Resource ID not defined, skipping test');
-        return;
+        throw new Error('Resource ID not defined');
       }
 
       try {
@@ -254,7 +246,7 @@ describe('Authorization Resource Server API', () => {
           expect(resource.attributes['test-attribute']).toBeDefined();
           expect(resource.attributes['test-attribute']).toEqual(['test-value']);
         } else {
-          console.warn('Resource does not have attributes property');
+          throw new Error('Resource does not have attributes property');
         }
       } catch (error) {
         console.error('Error getting resource attributes:', error);
@@ -265,8 +257,7 @@ describe('Authorization Resource Server API', () => {
     it('should delete a resource', async () => {
       // Skip if resource ID is not defined
       if (!resourceId) {
-        console.warn('Resource ID not defined, skipping test');
-        return;
+        throw new Error('Resource ID not defined');
       }
 
       try {
@@ -377,8 +368,7 @@ describe('Authorization Resource Server API', () => {
     it('should search for a scope by name', async () => {
       // Skip if scope name is not defined
       if (!testScope.name) {
-        console.warn('Scope name not defined, skipping test');
-        return;
+        throw new Error('Scope name not defined');
       }
 
       try {
@@ -397,8 +387,7 @@ describe('Authorization Resource Server API', () => {
     it('should update a scope', async () => {
       // Skip if scope ID is not defined
       if (!scopeId) {
-        console.warn('Scope ID not defined, skipping test');
-        return;
+        throw new Error('Scope ID not defined');
       }
 
       try {
@@ -426,8 +415,7 @@ describe('Authorization Resource Server API', () => {
     it('should delete a scope', async () => {
       // Skip if scope ID is not defined
       if (!scopeId) {
-        console.warn('Scope ID not defined, skipping test');
-        return;
+        throw new Error('Scope ID not defined');
       }
 
       try {
@@ -524,8 +512,7 @@ describe('Authorization Resource Server API', () => {
     it('should get policies', async () => {
       // Skip if policy ID is not defined
       if (!policyId) {
-        console.warn('Policy ID not defined, skipping test');
-        return;
+        throw new Error('Policy ID not defined');
       }
 
       try {
@@ -552,8 +539,7 @@ describe('Authorization Resource Server API', () => {
     it('should get a specific policy', async () => {
       // Skip if policy ID is not defined
       if (!policyId) {
-        console.warn('Policy ID not defined, skipping test');
-        return;
+        throw new Error('Policy ID not defined');
       }
 
       try {
@@ -578,8 +564,7 @@ describe('Authorization Resource Server API', () => {
     it('should update a policy', async () => {
       // Skip if policy ID is not defined
       if (!policyId) {
-        console.warn('Policy ID not defined, skipping test');
-        return;
+        throw new Error('Policy ID not defined');
       }
 
       try {
@@ -590,14 +575,7 @@ describe('Authorization Resource Server API', () => {
           description: 'Updated policy description'
         };
 
-        // Implement the updatePolicy method directly in the test
-        // This is a temporary solution until the method is implemented in the ResourceServerApi class
-        await sdk.request(
-          `/clients/${clientId}/authz/resource-server/policy/${policyId}`,
-          'PUT',
-          updatedPolicy
-        );
-        console.log(`Updated policy with ID: ${policyId}`);
+        await sdk.resourceServer.updatePolicy(clientId, policyId, updatedPolicy);
 
         // Get the updated policy
         const policies = await sdk.resourceServer.getPolicies(clientId, { policyId });
@@ -611,25 +589,19 @@ describe('Authorization Resource Server API', () => {
         expect(updatedPolicyFromServer.description).toBe(updatedPolicy.description);
       } catch (error) {
         console.error('Error updating policy:', error);
-        // This test may fail if the updatePolicy method is not implemented correctly
-        // We'll mark it as a known issue
-        console.warn(
-          'Policy update test may fail until updatePolicy method is properly implemented'
-        );
+        throw error;
       }
     });
 
     it('should search for a policy by name', async () => {
       // Skip if policy name is not defined
       if (!testPolicy.name) {
-        console.warn('Policy name not defined, skipping test');
-        return;
+        throw new Error('Policy name not defined');
       }
 
       try {
         // Search for the policy by name
-        const policyName = testPolicy.name;
-        const policy = await sdk.resourceServer.searchPolicy(clientId, policyName);
+        const policy = await sdk.resourceServer.searchPolicy(clientId, testPolicy.name);
 
         // Verify policy was found
         expect(policy).toBeDefined();
@@ -666,8 +638,7 @@ describe('Authorization Resource Server API', () => {
     it('should delete a policy', async () => {
       // Skip if policy ID is not defined
       if (!policyId) {
-        console.warn('Policy ID not defined, skipping test');
-        return;
+        throw new Error('Policy ID not defined');
       }
 
       try {
@@ -689,11 +660,7 @@ describe('Authorization Resource Server API', () => {
         }
       } catch (error) {
         console.error('Error deleting policy:', error);
-        // This test may fail if the deletePolicy method is not implemented correctly
-        // We'll mark it as a known issue
-        console.warn(
-          'Policy deletion test may fail until deletePolicy method is properly implemented'
-        );
+        throw error;
       }
     });
   });
