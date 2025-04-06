@@ -314,7 +314,6 @@ export class RolesByIdApi {
     }
 
     try {
-      console.log('Permissions payload:', JSON.stringify(permissions, null, 2));
       const endpoint = `/roles-by-id/${roleId}/management/permissions`;
 
       return this.sdk.request<ManagementPermissionReference>(endpoint, 'PUT', permissions);

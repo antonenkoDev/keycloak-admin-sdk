@@ -8,7 +8,7 @@ import KeycloakAdminSDK from '../../../src';
 import { RealmRepresentation } from '../../../src/types/realms';
 import { ClientRepresentation as ClientRep } from '../../../src/types/clients';
 import { KeycloakConfig } from '../../../src/types/auth';
-import dotenv from 'dotenv';
+import dotenv from 'dotenv'; // Load environment variables from .env file
 
 // Load environment variables from .env file
 dotenv.config();
@@ -164,7 +164,7 @@ export async function setupTestEnvironment(): Promise<TestContext> {
     };
 
     // Create the admin user in the test realm
-    const adminUserId = await adminSdk.requestForRealm<{ id: string }>(
+    const adminUserCreatedId = await adminSdk.requestForRealm<string>(
       realmName,
       '/users',
       'POST',
@@ -210,7 +210,7 @@ export async function setupTestEnvironment(): Promise<TestContext> {
     // Assign the role to the user
     await adminSdk.requestForRealm<void>(
       realmName,
-      `/users/${adminUserId.id}/role-mappings/clients/${realmManagementClient.id}`,
+      `/users/${adminUserCreatedId}/role-mappings/clients/${realmManagementClient.id}`,
       'POST',
       [adminRole]
     );
@@ -234,7 +234,7 @@ export async function setupTestEnvironment(): Promise<TestContext> {
       sdk,
       realmName,
       groupIds: [],
-      userIds: [adminUserId.id] // Track the admin user ID for cleanup
+      userIds: [adminUserCreatedId] // Track the admin user ID for cleanup
     };
   } catch (error) {
     console.error('Error creating test realm:', error);
@@ -244,15 +244,6 @@ export async function setupTestEnvironment(): Promise<TestContext> {
     }
     throw error;
   }
-
-  // This code should not be reached as we return in the try block
-  // But just in case, create a new SDK instance for the test realm
-  return {
-    sdk: new KeycloakAdminSDK({ ...config, realm: realmName }),
-    realmName,
-    groupIds: [],
-    userIds: []
-  };
 }
 
 /**

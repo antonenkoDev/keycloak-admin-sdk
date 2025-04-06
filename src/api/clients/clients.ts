@@ -86,8 +86,7 @@ export class ClientsApi {
     }
 
     try {
-      const response = await this.sdk.request<{ id: string }>('/clients', 'POST', client);
-      return response.id;
+      return await this.sdk.request<string>('/clients', 'POST', client);
     } catch (error) {
       throw new Error(
         `Failed to create client: ${error instanceof Error ? error.message : String(error)}`

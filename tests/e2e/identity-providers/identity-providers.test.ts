@@ -73,6 +73,7 @@ describe('Identity Providers API E2E Tests', () => {
       try {
         // Create a test identity provider
         testProviderAlias = generateUniqueName('test-idp');
+        testProviderAlias = generateUniqueName('test-idp');
         const idp: IdentityProviderRepresentation = {
           alias: testProviderAlias,
           displayName: 'Test Identity Provider',
@@ -210,17 +211,15 @@ describe('Identity Providers API E2E Tests', () => {
         let mapperTypes: Record<string, any> = {};
         try {
           mapperTypes = await sdk.identityProviders.getMapperTypes(testProviderAlias);
-          console.log(
-            `Retrieved ${Object.keys(mapperTypes).length} mapper types for provider ${testProviderAlias}`
-          );
           expect(mapperTypes).toBeDefined();
           expect(typeof mapperTypes).toBe('object');
         } catch (error) {
-          console.warn(
+          console.error(
             `Error getting mapper types for provider ${testProviderAlias}: ${error instanceof Error ? error.message : String(error)}`
           );
-          console.warn('Continuing test with default mapper type');
-          // Proceed with empty mapper types object
+          throw new Error(
+            `Failed to get mapper types: ${error instanceof Error ? error.message : String(error)}`
+          );
         }
 
         // Use a default mapper type if none found
@@ -246,10 +245,10 @@ describe('Identity Providers API E2E Tests', () => {
           if (mapperKey && mapperTypes[mapperKey] && mapperTypes[mapperKey].id) {
             mapperTypeId = mapperTypes[mapperKey].id;
           } else {
-            console.warn(`Could not find a valid mapper type ID, using default: ${mapperTypeId}`);
+            throw new Error(`Could not find a valid mapper type ID in available types`);
           }
         } else {
-          console.warn(`No mapper types available, using default: ${mapperTypeId}`);
+          throw new Error(`No mapper types available for provider ${testProviderAlias}`);
         }
 
         // Create a mapper with the determined type
@@ -264,19 +263,14 @@ describe('Identity Providers API E2E Tests', () => {
           }
         };
 
-        testMapperId = await sdk.identityProviders.createMapper(testProviderAlias, mapper);
-
-        expect(testMapperId).toBeDefined();
-
+        const createdMapperId = await sdk.identityProviders.createMapper(testProviderAlias, mapper);
+        expect(createdMapperId).toBeDefined();
         // Get all mappers
         let mappers;
         try {
           mappers = await sdk.identityProviders.getMappers(testProviderAlias);
 
           expect(Array.isArray(mappers)).toBe(true);
-
-          // Log all mapper IDs and names for debugging
-          mappers.forEach(m => {});
 
           // The mapper ID might be the name or an actual ID
           const hasTestMapper = mappers.some(
@@ -286,31 +280,32 @@ describe('Identity Providers API E2E Tests', () => {
               (m.name && m.name.includes(mapperName))
           );
 
-          if (hasTestMapper) {
-          } else {
-            console.warn(
-              `Mapper not found in list. Created ID: ${testMapperId}, Name: ${mapperName}`
+          if (!hasTestMapper) {
+            throw new Error(
+              `Mapper not found in list after creation. Created ID: ${testMapperId}, Name: ${mapperName}`
             );
           }
         } catch (error) {
-          console.warn(
+          console.error(
             `Error getting mappers: ${error instanceof Error ? error.message : String(error)}`
           );
-          console.warn('Continuing test despite error getting mappers');
+          throw new Error(
+            `Failed to get mappers: ${error instanceof Error ? error.message : String(error)}`
+          );
         }
 
         // Get the specific mapper
         let createdMapper;
         try {
-          createdMapper = await sdk.identityProviders.getMapper(testProviderAlias, testMapperId);
-          console.log(`Successfully retrieved mapper: ${JSON.stringify(createdMapper)}`);
+          createdMapper = await sdk.identityProviders.getMapper(testProviderAlias, createdMapperId);
           expect(createdMapper.name).toBe(mapperName);
         } catch (error) {
-          console.warn(
+          console.error(
             `Error getting mapper: ${error instanceof Error ? error.message : String(error)}`
           );
-          console.warn('Skipping mapper update and delete tests due to error getting mapper');
-          return;
+          throw new Error(
+            `Failed to get created mapper: ${error instanceof Error ? error.message : String(error)}`
+          );
         }
 
         // Update the mapper
@@ -325,41 +320,47 @@ describe('Identity Providers API E2E Tests', () => {
             }
           };
 
-          await sdk.identityProviders.updateMapper(testProviderAlias, testMapperId, updatedMapper);
+          await sdk.identityProviders.updateMapper(
+            testProviderAlias,
+            createdMapperId,
+            updatedMapper
+          );
 
           // Get the updated mapper
           const retrievedMapper = await sdk.identityProviders.getMapper(
             testProviderAlias,
-            testMapperId
+            createdMapperId
           );
-          console.log(`Retrieved updated mapper: ${JSON.stringify(retrievedMapper)}`);
           expect(retrievedMapper.name).toBe(updatedName);
           expect(retrievedMapper.config?.syncMode).toBe('FORCE');
         } catch (error) {
-          console.warn(
+          console.error(
             `Error updating mapper: ${error instanceof Error ? error.message : String(error)}`
           );
-          console.warn('Skipping mapper delete test due to error updating mapper');
-          return;
+          throw new Error(
+            `Failed to update mapper: ${error instanceof Error ? error.message : String(error)}`
+          );
         }
 
         // Delete the mapper
         try {
-          await sdk.identityProviders.deleteMapper(testProviderAlias, testMapperId);
+          await sdk.identityProviders.deleteMapper(testProviderAlias, createdMapperId);
 
           // Verify the mapper was deleted
           try {
-            await sdk.identityProviders.getMapper(testProviderAlias, testMapperId);
-            console.warn('Mapper still exists after deletion attempt');
-            fail('Mapper should have been deleted');
+            await sdk.identityProviders.getMapper(testProviderAlias, createdMapperId);
+            console.error('Mapper still exists after deletion attempt');
+            throw new Error('Mapper should have been deleted but still exists');
           } catch (error) {
             // Expected error - mapper should not exist
-            console.log('Confirmed mapper was deleted (404 error as expected)');
             expect(error).toBeDefined();
           }
         } catch (error) {
-          console.warn(
+          console.error(
             `Error deleting mapper: ${error instanceof Error ? error.message : String(error)}`
+          );
+          throw new Error(
+            `Failed to delete mapper: ${error instanceof Error ? error.message : String(error)}`
           );
         }
       } catch (error) {
@@ -390,7 +391,8 @@ describe('Identity Providers API E2E Tests', () => {
         // Verify the identity provider was deleted
         try {
           await sdk.identityProviders.get(testProviderAlias);
-          fail('Identity provider should have been deleted');
+          console.error('Identity provider still exists after deletion attempt');
+          throw new Error('Identity provider should have been deleted but still exists');
         } catch (error) {
           // Expected error - provider should not exist
           expect(error).toBeDefined();

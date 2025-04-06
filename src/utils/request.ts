@@ -21,6 +21,7 @@ export class RequestError extends Error {
  * @param method The HTTP method to use
  * @param token The authentication token
  * @param body Optional request body
+ * @param options Overrides default HTTP headers
  * @returns The response data
  */
 export async function makeRequest<T>(
@@ -59,8 +60,19 @@ export async function makeRequest<T>(
       throw new RequestError(response.status, response.statusText, errorText);
     }
 
+    // Handle response based on content type and status
+    const contentType = response.headers.get('content-type');
+
     // Handle 201 Created responses with Location header (typically for resource creation)
     if (response.status === 201) {
+      if (contentType?.includes('application/json')) {
+        const data = (await response.json()) as T;
+
+        if (data && Object.keys(data).length > 0) {
+          return data as T;
+        }
+      }
+
       const location = response.headers.get('location');
       if (location) {
         // Extract the ID from the location header (last part of the URL)
@@ -70,9 +82,9 @@ export async function makeRequest<T>(
           // This is determined by checking if the method is POST and the URL ends with a collection endpoint
           if (
             method === 'POST' &&
-            /\/(users|groups|clients|roles|client-scopes|organizations)$/.test(url)
+            /\/(users|groups|clients|roles|client-scopes|organizations|mappers)$/.test(url)
           ) {
-            return { id } as T;
+            return id as T;
           }
         }
       }
@@ -84,9 +96,6 @@ export async function makeRequest<T>(
     if (response.status === 204) {
       return {} as T;
     }
-
-    // Handle response based on content type and status
-    const contentType = response.headers.get('content-type');
 
     // For 204 No Content or empty responses, return empty object
     if (response.status === 204 || response.headers.get('content-length') === '0') {

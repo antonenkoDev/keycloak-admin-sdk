@@ -35,11 +35,8 @@ export class IdentityProvidersApi {
    *
    * Endpoint: GET /admin/realms/{realm}/identity-provider/instances
    *
-   * @param briefRepresentation - Whether to return brief representations
-   * @param first - Pagination offset
-   * @param max - Maximum results size (defaults to 100)
-   * @param search - Filter providers by name
    * @returns Promise resolving to an array of identity provider representations
+   * @param options
    */
   async findAll(options?: {
     briefRepresentation?: boolean;
@@ -302,19 +299,11 @@ export class IdentityProvidersApi {
 
     try {
       // According to the Keycloak API, this endpoint returns 201 Created with the ID in the response
-      const response = await this.sdk.request<{ id: string }>(
+      return this.sdk.request<string>(
         `/identity-provider/instances/${alias}/mappers`,
         'POST',
         mapper
       );
-
-      if (response && response.id) {
-        return response.id;
-      } else {
-        // If we don't get an ID back, use the name as a fallback
-        console.warn('No ID returned from create mapper endpoint, using name as ID');
-        return mapper.name || '';
-      }
     } catch (error) {
       console.error(`Error creating mapper for identity provider ${alias}:`, error);
       throw new Error(

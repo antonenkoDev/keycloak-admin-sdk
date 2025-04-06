@@ -127,7 +127,6 @@ describe('Client Role Mappings API E2E Tests', () => {
         // Get the client role using the role name instead of ID
         try {
           const role = await sdk.clients.getRole(clientId, roleName);
-          console.log(`Retrieved role: ${JSON.stringify(role)}`);
 
           if (!role || !role.id) {
             console.error('Role not found or missing ID');
@@ -144,7 +143,6 @@ describe('Client Role Mappings API E2E Tests', () => {
             userId,
             clientId
           );
-          console.log(`Retrieved ${userRoles.length} user roles: ${JSON.stringify(userRoles)}`);
 
           // Check if role exists in user's role mappings
           const hasRole = userRoles.some(r => r.id === role.id);

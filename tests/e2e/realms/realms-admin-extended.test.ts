@@ -204,52 +204,44 @@ describe('Extended Realms Admin API E2E Tests', () => {
       await testContext.sdk.realms.addLocalizationTexts(testContext.realmName, locale, texts);
 
       // Get localization text
+      const retrievedText = await testContext.sdk.realms.getLocalizationText(
+        testContext.realmName,
+        locale,
+        testKey
+      );
+
+      // Verify the text
+      expect(retrievedText).toBe(testValue);
+
+      // Update localization text
+      await testContext.sdk.realms.updateLocalizationText(
+        testContext.realmName,
+        locale,
+        testKey,
+        updatedValue
+      );
+
+      // Get updated text
+      const updatedText = await testContext.sdk.realms.getLocalizationText(
+        testContext.realmName,
+        locale,
+        testKey
+      );
+
+      // Verify the update
+      expect(updatedText).toBe(updatedValue);
+
+      // Delete localization text
+      await testContext.sdk.realms.deleteLocalizationText(testContext.realmName, locale, testKey);
+
+      // Verify deletion by expecting an error when getting the text
       try {
-        const retrievedText = await testContext.sdk.realms.getLocalizationText(
-          testContext.realmName,
-          locale,
-          testKey
-        );
-
-        // Verify the text
-        expect(retrievedText).toBe(testValue);
-
-        // Update localization text
-        await testContext.sdk.realms.updateLocalizationText(
-          testContext.realmName,
-          locale,
-          testKey,
-          updatedValue
-        );
-
-        // Get updated text
-        const updatedText = await testContext.sdk.realms.getLocalizationText(
-          testContext.realmName,
-          locale,
-          testKey
-        );
-
-        // Verify the update
-        expect(updatedText).toBe(updatedValue);
-
-        // Delete localization text
-        await testContext.sdk.realms.deleteLocalizationText(testContext.realmName, locale, testKey);
-
-        // Verify deletion by expecting an error when getting the text
-        try {
-          await testContext.sdk.realms.getLocalizationText(testContext.realmName, locale, testKey);
-          // If we get here, the text wasn't deleted
-          expect(true).toBe(false); // Force test to fail
-        } catch (error) {
-          // Expected error, text was deleted
-          expect(error).toBeDefined();
-        }
+        await testContext.sdk.realms.getLocalizationText(testContext.realmName, locale, testKey);
+        // If we get here, the text wasn't deleted
+        expect(true).toBe(false); // Force test to fail
       } catch (error) {
-        console.log(
-          `Error getting localization text: ${error instanceof Error ? error.message : String(error)}`
-        );
-        // Some Keycloak versions might not support individual text retrieval
-        // Skip the rest of the test in this case
+        // Expected error, text was deleted
+        expect(error).toBeDefined();
       }
 
       // Get supported locales
@@ -322,16 +314,13 @@ describe('Extended Realms Admin API E2E Tests', () => {
    */
   test('should convert client description', async () => {
     try {
-      // Get the base URL from the test setup config
-      const baseUrl = process.env.KEYCLOAK_BASE_URL || 'http://localhost:8080';
-
       // Create a simple OpenID Connect client description
       const clientDescription = JSON.stringify({
-        issuer: `${baseUrl}/realms/${testContext.realmName}`,
-        authorization_endpoint: `${baseUrl}/realms/${testContext.realmName}/protocol/openid-connect/auth`,
-        token_endpoint: `${baseUrl}/realms/${testContext.realmName}/protocol/openid-connect/token`,
-        jwks_uri: `${baseUrl}/realms/${testContext.realmName}/protocol/openid-connect/certs`,
-        response_types_supported: ['code', 'token', 'id_token']
+        client_id: 'test-client',
+        redirect_uris: ['https://example.com/callback'],
+        grant_types: ['authorization_code'],
+        response_types: ['code'],
+        token_endpoint_auth_method: 'client_secret_basic'
       });
 
       // Convert client description
@@ -345,10 +334,10 @@ describe('Extended Realms Admin API E2E Tests', () => {
       expect(convertedClient).toHaveProperty('clientId');
       expect(convertedClient).toHaveProperty('protocol', 'openid-connect');
     } catch (error) {
-      console.error(
+      console.error(error);
+      throw new Error(
         `Error in client description converter test: ${error instanceof Error ? error.message : String(error)}`
       );
-      // This might fail depending on the format of the client description
     }
   });
 });

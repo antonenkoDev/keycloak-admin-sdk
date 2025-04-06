@@ -1,16 +1,16 @@
 /**
  * Example demonstrating the usage of the Authorization Resource Server API
- * 
+ *
  * This example shows how to manage authorization resources, scopes, and policies
  * in a Keycloak client with authorization services enabled.
  */
 
 import KeycloakAdminSDK from '../src';
-import { 
-  ResourceServerRepresentation, 
+import {
+  PolicyRepresentation,
   ResourceRepresentation,
-  ScopeRepresentation,
-  PolicyRepresentation
+  ResourceServerRepresentation,
+  ScopeRepresentation
 } from '../src/types/authorization';
 
 /**
@@ -25,7 +25,7 @@ function createSdk(): KeycloakAdminSDK {
     credentials: {
       clientId: process.env.KEYCLOAK_CLIENT_ID || 'admin-cli',
       username: process.env.KEYCLOAK_USERNAME || 'admin',
-      password: process.env.KEYCLOAK_PASSWORD || 'admin',
+      password: process.env.KEYCLOAK_PASSWORD || 'admin'
     }
   });
 }
@@ -37,33 +37,23 @@ function createSdk(): KeycloakAdminSDK {
  */
 async function getOrCreateAuthzClient(sdk: KeycloakAdminSDK): Promise<string> {
   const clientId = 'authz-test-client';
-  
+
   // Check if client exists
   try {
-    const clients = await sdk.clients.getClients({ clientId });
-    
-    if (clients.length > 0) {
-      // Client exists, make sure authorization is enabled
-      const client = clients[0];
-      
-      if (!client.authorizationServicesEnabled) {
-        // Enable authorization services
-        await sdk.clients.updateClient(client.id!, {
-          ...client,
-          authorizationServicesEnabled: true,
-          serviceAccountsEnabled: true
-        });
-      }
-      
+    const client = await sdk.clients.findById(clientId);
+
+    if (client) {
       return client.id!;
     }
   } catch (error) {
-    console.log(`Error checking for client: ${error instanceof Error ? error.message : String(error)}`);
+    console.log(
+      `Error checking for client: ${error instanceof Error ? error.message : String(error)}`
+    );
   }
-  
+
   // Create new client with authorization services
   try {
-    const newClient = await sdk.clients.createClient({
+    const newClient = await sdk.clients.create({
       clientId,
       name: 'Authorization Test Client',
       authorizationServicesEnabled: true,
@@ -72,10 +62,12 @@ async function getOrCreateAuthzClient(sdk: KeycloakAdminSDK): Promise<string> {
       standardFlowEnabled: true,
       directAccessGrantsEnabled: true
     });
-    
+
     return newClient.id!;
   } catch (error) {
-    throw new Error(`Failed to create client: ${error instanceof Error ? error.message : String(error)}`);
+    throw new Error(
+      `Failed to create client: ${error instanceof Error ? error.message : String(error)}`
+    );
   }
 }
 
@@ -90,9 +82,11 @@ async function getResourceServer(
   clientUuid: string
 ): Promise<ResourceServerRepresentation> {
   try {
-    return await sdk.resourceServer.getResourceServer(clientUuid);
+    return await sdk.authorizationServices.resourceServer.getResourceServer(clientUuid);
   } catch (error) {
-    throw new Error(`Failed to get resource server: ${error instanceof Error ? error.message : String(error)}`);
+    throw new Error(
+      `Failed to get resource server: ${error instanceof Error ? error.message : String(error)}`
+    );
   }
 }
 
@@ -117,13 +111,15 @@ async function createResource(
       scopes: [],
       attributes: {
         'resource-type': ['example'],
-        'visibility': ['public']
+        visibility: ['public']
       }
     };
-    
-    return await sdk.resourceServer.createResource(clientUuid, resource);
+
+    return await sdk.authorizationServices.resources.createResource(clientUuid, resource);
   } catch (error) {
-    throw new Error(`Failed to create resource: ${error instanceof Error ? error.message : String(error)}`);
+    throw new Error(
+      `Failed to create resource: ${error instanceof Error ? error.message : String(error)}`
+    );
   }
 }
 
@@ -144,10 +140,12 @@ async function createScope(
       name: scopeName,
       displayName: `${scopeName} Display Name`
     };
-    
-    return await sdk.resourceServer.createScope(clientUuid, scope);
+
+    return await sdk.authorizationServices.scopes.createScope(clientUuid, scope);
   } catch (error) {
-    throw new Error(`Failed to create scope: ${error instanceof Error ? error.message : String(error)}`);
+    throw new Error(
+      `Failed to create scope: ${error instanceof Error ? error.message : String(error)}`
+    );
   }
 }
 
@@ -185,10 +183,12 @@ async function createJsPolicy(
         `
       }
     };
-    
-    return await sdk.resourceServer.createPolicy(clientUuid, policy);
+
+    return await sdk.authorizationServices.policies.createPolicy(clientUuid, policy);
   } catch (error) {
-    throw new Error(`Failed to create policy: ${error instanceof Error ? error.message : String(error)}`);
+    throw new Error(
+      `Failed to create policy: ${error instanceof Error ? error.message : String(error)}`
+    );
   }
 }
 
@@ -206,39 +206,39 @@ async function example(): Promise<{
 }> {
   try {
     const sdk = createSdk();
-    
+
     // Get or create a client with authorization services
     const clientUuid = await getOrCreateAuthzClient(sdk);
     console.log(`Using client with ID: ${clientUuid}`);
-    
+
     // Get resource server configuration
     const resourceServer = await getResourceServer(sdk, clientUuid);
     console.log(`Resource server ID: ${resourceServer.id}`);
-    
+
     // Create a resource
     const resource = await createResource(sdk, clientUuid, 'ExampleResource');
     console.log(`Created resource with ID: ${resource.id}`);
-    
+
     // Create a scope
     const scope = await createScope(sdk, clientUuid, 'example:read');
     console.log(`Created scope with ID: ${scope.id}`);
-    
+
     // Create a policy
     const policy = await createJsPolicy(sdk, clientUuid, 'ExamplePolicy');
     console.log(`Created policy with ID: ${policy.id}`);
-    
+
     // Get all resources
-    const resources = await sdk.resourceServer.getResources(clientUuid);
+    const resources = await sdk.authorizationServices.resources.getResources(clientUuid);
     console.log(`Total resources: ${resources.length}`);
-    
+
     // Get all scopes
-    const scopes = await sdk.resourceServer.getScopes(clientUuid);
+    const scopes = await sdk.authorizationServices.scopes.getScopes(clientUuid);
     console.log(`Total scopes: ${scopes.length}`);
-    
+
     // Get all policies
-    const policies = await sdk.resourceServer.getPolicies(clientUuid);
+    const policies = await sdk.authorizationServices.policies.getPolicies(clientUuid);
     console.log(`Total policies: ${policies.length}`);
-    
+
     // Return structured data
     return {
       resourceServer,
@@ -250,7 +250,9 @@ async function example(): Promise<{
       allPolicies: policies.length
     };
   } catch (error) {
-    throw new Error(`Error in authorization example: ${error instanceof Error ? error.message : String(error)}`);
+    throw new Error(
+      `Error in authorization example: ${error instanceof Error ? error.message : String(error)}`
+    );
   }
 }
 
@@ -266,9 +268,4 @@ if (require.main === module) {
     });
 }
 
-export { 
-  getResourceServer, 
-  createResource, 
-  createScope, 
-  createJsPolicy 
-};
+export { getResourceServer, createResource, createScope, createJsPolicy };

@@ -86,15 +86,10 @@ describe('Organizations API E2E Tests', () => {
 
       try {
         // Create the identity provider in the realm
-        await sdk.requestForRealm(
-          testContext.realmName,
-          '/identity-providers/instances',
-          'POST',
-          idp
-        );
+        await sdk.identityProviders.create(idp);
       } catch (error) {
         console.error('Error creating identity provider:', error);
-        // If we can't create the identity provider, we'll skip the tests that need it
+        throw new Error('Error creating identity provider:');
       }
     } catch (error) {
       console.error('Error setting up test environment:', error);
@@ -155,7 +150,6 @@ describe('Organizations API E2E Tests', () => {
         await sdk.organizations.list({ max: 1 });
       } catch (error) {
         throw new Error('Organizations API not supported');
-        return;
       }
 
       try {
@@ -204,7 +198,6 @@ describe('Organizations API E2E Tests', () => {
       // Skip test if Organizations API is not supported or if no organization was created
       if (!organizationId) {
         throw new Error('Organization ID not available');
-        return;
       }
 
       try {
@@ -248,15 +241,11 @@ describe('Organizations API E2E Tests', () => {
       // Skip test if Organizations API is not supported or if no organization was created
       if (!organizationId) {
         throw new Error('Organization ID not available');
-        return;
       }
 
       try {
         // Get current organization
         const organization = await sdk.organizations.get(organizationId);
-
-        // Update organization
-        const updatedDisplayName = `Updated Organization ${Date.now()}`;
 
         // Add a new attribute
         if (!organization.attributes) {
@@ -324,7 +313,6 @@ describe('Organizations API E2E Tests', () => {
       // Skip test if Organizations API is not supported or if no organization was created
       if (!organizationId || !userId) {
         throw new Error('Organization ID or User ID not available');
-        return;
       }
 
       try {
@@ -362,12 +350,10 @@ describe('Organizations API E2E Tests', () => {
       // Skip test if Organizations API is not supported or if no organization was created
       if (!organizationId) {
         throw new Error('Organization ID not available');
-        return;
       }
 
       if (!userId) {
         throw new Error('User ID not available');
-        return;
       }
 
       try {
@@ -395,7 +381,6 @@ describe('Organizations API E2E Tests', () => {
       // Skip test if Organizations API is not supported or if no organization was created
       if (!organizationId) {
         throw new Error('Organization ID not available');
-        return;
       }
 
       try {
@@ -424,7 +409,6 @@ describe('Organizations API E2E Tests', () => {
       // Skip test if Organizations API is not supported or if no organization was created
       if (!organizationId) {
         throw new Error('Organization ID not available');
-        return;
       }
 
       try {
@@ -449,7 +433,6 @@ describe('Organizations API E2E Tests', () => {
       // Skip test if Organizations API is not supported or if no organization was created
       if (!organizationId) {
         throw new Error('Organization ID not available');
-        return;
       }
 
       try {

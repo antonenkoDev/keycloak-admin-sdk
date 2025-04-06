@@ -1039,7 +1039,12 @@ export class RealmsApi {
     }
 
     try {
-      return this.sdk.requestForRealm<string>(realmName, `/localization/${locale}/${key}`, 'GET');
+      const response = await this.sdk.requestForRealm<{ text: string }>(
+        realmName,
+        `/localization/${locale}/${key}`,
+        'GET'
+      );
+      return response.text;
     } catch (error) {
       throw new Error(
         `Failed to get localization text for realm ${realmName}, locale ${locale}, and key ${key}: ${error instanceof Error ? error.message : String(error)}`
@@ -1086,7 +1091,8 @@ export class RealmsApi {
         realmName,
         `/localization/${locale}/${key}`,
         'PUT',
-        text
+        text,
+        { headers: { 'Content-Type': 'text/plain' } }
       );
     } catch (error) {
       throw new Error(

@@ -40,7 +40,7 @@ describe('Authorization Resource Server API', () => {
       // This is already done in the createTestClient function, but we verify it here
       try {
         // Get the resource server configuration to verify it exists
-        await sdk.resourceServer.getResourceServer(clientId);
+        await sdk.authorizationServices.resourceServer.getResourceServer(clientId);
       } catch (error) {
         console.error('Error verifying resource server configuration:', error);
         console.error('Make sure authorization services are enabled for the client');
@@ -67,7 +67,8 @@ describe('Authorization Resource Server API', () => {
    */
   it('should get resource server configuration', async () => {
     // Get resource server configuration
-    const resourceServer = await sdk.resourceServer.getResourceServer(clientId);
+    const resourceServer =
+      await sdk.authorizationServices.resourceServer.getResourceServer(clientId);
 
     // Verify the response structure
     expect(resourceServer).toBeDefined();
@@ -97,12 +98,16 @@ describe('Authorization Resource Server API', () => {
     beforeAll(async () => {
       try {
         // Try to find existing resources with the same name
-        const resources = await sdk.resourceServer.getResources(clientId);
+        const resources =
+          await sdk.authorizationServices.resourceServer.getResourceServer(clientId);
         if (Array.isArray(resources)) {
           const existingResource = resources.find(r => r.name === testResource.name);
           if (existingResource && existingResource._id) {
             console.log(`Found existing resource with name ${testResource.name}, cleaning up...`);
-            await sdk.resourceServer.deleteResource(clientId, existingResource._id);
+            await sdk.authorizationServices.resourceServer.deleteResource(
+              clientId,
+              existingResource._id
+            );
           }
         }
       } catch (error) {
@@ -114,7 +119,10 @@ describe('Authorization Resource Server API', () => {
     it('should create a resource', async () => {
       try {
         // Create a resource
-        const resource = await sdk.resourceServer.createResource(clientId, testResource);
+        const resource = await sdk.authorizationServices.resourceServer.createResource(
+          clientId,
+          testResource
+        );
         resourceId = resource._id;
       } catch (error) {
         console.error('Error creating resource:', error);
@@ -130,7 +138,7 @@ describe('Authorization Resource Server API', () => {
 
       try {
         // Get all resources
-        const resources = await sdk.resourceServer.getResources(clientId);
+        const resources = await sdk.authorizationServices.resourceServer.getResources(clientId);
 
         // Verify resources were retrieved
         expect(resources).toBeDefined();
@@ -168,7 +176,10 @@ describe('Authorization Resource Server API', () => {
 
       try {
         // Get resource by ID
-        const resource = await sdk.resourceServer.getResource(clientId, resourceId);
+        const resource = await sdk.authorizationServices.resourceServer.getResource(
+          clientId,
+          resourceId
+        );
 
         // Verify resource was retrieved correctly
         expect(resource).toBeDefined();
@@ -196,10 +207,17 @@ describe('Authorization Resource Server API', () => {
           uris: ['/api/test', '/api/test2']
         };
 
-        await sdk.resourceServer.updateResource(clientId, resourceId, updatedResource);
+        await sdk.authorizationServices.resourceServer.updateResource(
+          clientId,
+          resourceId,
+          updatedResource
+        );
 
         // Get the updated resource
-        const resource = await sdk.resourceServer.getResource(clientId, resourceId);
+        const resource = await sdk.authorizationServices.resourceServer.getResource(
+          clientId,
+          resourceId
+        );
 
         // Verify resource was updated correctly
         expect(resource).toBeDefined();
@@ -219,7 +237,10 @@ describe('Authorization Resource Server API', () => {
 
       try {
         // Search for the resource by name
-        const resource = await sdk.resourceServer.searchResource(clientId, testResource.name);
+        const resource = await sdk.authorizationServices.resourceServer.searchResource(
+          clientId,
+          testResource.name
+        );
 
         // Verify resource was found
         expect(resource).toBeDefined();
@@ -237,7 +258,10 @@ describe('Authorization Resource Server API', () => {
 
       try {
         // Get the resource first to verify it exists
-        const resource = await sdk.resourceServer.getResource(clientId, resourceId);
+        const resource = await sdk.authorizationServices.resourceServer.getResource(
+          clientId,
+          resourceId
+        );
 
         // If the resource exists, get its attributes
         if (resource && resource.attributes) {
@@ -262,11 +286,11 @@ describe('Authorization Resource Server API', () => {
 
       try {
         // Delete the resource
-        await sdk.resourceServer.deleteResource(clientId, resourceId);
+        await sdk.authorizationServices.resourceServer.deleteResource(clientId, resourceId);
 
         // Try to get the deleted resource - should throw an error
         try {
-          await sdk.resourceServer.getResource(clientId, resourceId);
+          await sdk.authorizationServices.resourceServer.getResource(clientId, resourceId);
           // If we get here, the test failed
           fail('Resource was not deleted');
         } catch (error) {
@@ -294,12 +318,12 @@ describe('Authorization Resource Server API', () => {
     beforeAll(async () => {
       try {
         // Try to find existing scopes with the same name
-        const scopes = await sdk.resourceServer.getScopes(clientId);
+        const scopes = await sdk.authorizationServices.scopes.getScopes(clientId);
         if (Array.isArray(scopes)) {
           const existingScope = scopes.find(s => s.name === testScope.name);
           if (existingScope && existingScope.id) {
             console.log(`Found existing scope with name ${testScope.name}, cleaning up...`);
-            await sdk.resourceServer.deleteScope(clientId, existingScope.id);
+            await sdk.authorizationServices.scopes.deleteScope(clientId, existingScope.id);
           }
         }
       } catch (error) {
@@ -311,7 +335,7 @@ describe('Authorization Resource Server API', () => {
     it('should create a scope', async () => {
       try {
         // Create a scope
-        await sdk.resourceServer.createScope(clientId, testScope);
+        await sdk.authorizationServices.scopes.createScope(clientId, testScope);
 
         // No response body expected. Test is passed if no errors.
         expect(true).toBe(true);
@@ -325,7 +349,7 @@ describe('Authorization Resource Server API', () => {
       // Skip if scope ID is not defined
       try {
         // Get all scopes
-        const scopes = await sdk.resourceServer.getScopes(clientId);
+        const scopes = await sdk.authorizationServices.scopes.getScopes(clientId);
 
         // Verify scopes were retrieved
         expect(scopes).toBeDefined();
@@ -352,7 +376,7 @@ describe('Authorization Resource Server API', () => {
 
       try {
         // Get the specific scope
-        const scope = await sdk.resourceServer.getScope(clientId, scopeId);
+        const scope = await sdk.authorizationServices.scopes.getScope(clientId, scopeId);
 
         // Verify scope was retrieved correctly
         expect(scope).toBeDefined();
@@ -374,7 +398,7 @@ describe('Authorization Resource Server API', () => {
       try {
         // Search for the scope by name
         const scopeName = testScope.name;
-        const scope = await sdk.resourceServer.searchScope(clientId, scopeName);
+        const scope = await sdk.authorizationServices.scopes.searchScope(clientId, scopeName);
 
         // Verify scope was found
         expect(scope.name).toBe('test-scope');
@@ -398,10 +422,10 @@ describe('Authorization Resource Server API', () => {
           displayName: 'Updated Scope Display Name'
         };
 
-        await sdk.resourceServer.updateScope(clientId, scopeId, updatedScope);
+        await sdk.authorizationServices.scopes.updateScope(clientId, scopeId, updatedScope);
 
         // Get the updated scope
-        const scope = await sdk.resourceServer.getScope(clientId, scopeId);
+        const scope = await sdk.authorizationServices.scopes.getScope(clientId, scopeId);
 
         // Verify scope was updated correctly
         expect(scope).toBeDefined();
@@ -420,11 +444,11 @@ describe('Authorization Resource Server API', () => {
 
       try {
         // Delete the scope
-        await sdk.resourceServer.deleteScope(clientId, scopeId);
+        await sdk.authorizationServices.scopes.deleteScope(clientId, scopeId);
 
         // Try to get the deleted scope - should throw an error
         try {
-          await sdk.resourceServer.getScope(clientId, scopeId);
+          await sdk.authorizationServices.scopes.getScope(clientId, scopeId);
           // If we get here, the test failed
           fail('Scope was not deleted');
         } catch (error) {
@@ -450,7 +474,7 @@ describe('Authorization Resource Server API', () => {
     beforeAll(async () => {
       try {
         // Get client scopes from the realm
-        const clientScopes = await sdk.resourceServer.getScopes(clientId);
+        const clientScopes = await sdk.authorizationServices.scopes.getScopes(clientId);
 
         // Use the first available client scope
         if (clientScopes && clientScopes.length > 0) {
@@ -491,11 +515,10 @@ describe('Authorization Resource Server API', () => {
     it('should create a policy', async () => {
       try {
         // Create a policy
-        const policy = await sdk.resourceServer.createPolicy(clientId, testPolicy);
+        const policy = await sdk.authorizationServices.policies.createPolicy(clientId, testPolicy);
 
         // Store policy ID for later tests
         policyId = policy.id!;
-        console.log(`Created policy with ID: ${policyId}`);
 
         // Verify policy was created correctly
         expect(policy).toBeDefined();
@@ -517,7 +540,7 @@ describe('Authorization Resource Server API', () => {
 
       try {
         // Get all policies
-        const policies = await sdk.resourceServer.getPolicies(clientId);
+        const policies = await sdk.authorizationServices.policies.getPolicies(clientId);
 
         // Verify policies were retrieved
         expect(policies).toBeDefined();
@@ -544,7 +567,9 @@ describe('Authorization Resource Server API', () => {
 
       try {
         // Get the specific policy
-        const policy = await sdk.resourceServer.getPolicies(clientId, { policyId });
+        const policy = await sdk.authorizationServices.policies.getPolicies(clientId, {
+          policyId
+        });
 
         // Verify policy was retrieved correctly
         expect(policy).toBeDefined();
@@ -575,10 +600,12 @@ describe('Authorization Resource Server API', () => {
           description: 'Updated policy description'
         };
 
-        await sdk.resourceServer.updatePolicy(clientId, policyId, updatedPolicy);
+        await sdk.authorizationServices.policies.updatePolicy(clientId, policyId, updatedPolicy);
 
         // Get the updated policy
-        const policies = await sdk.resourceServer.getPolicies(clientId, { policyId });
+        const policies = await sdk.authorizationServices.policies.getPolicies(clientId, {
+          policyId
+        });
 
         // Verify policy exists and was updated
         expect(policies).toBeDefined();
@@ -601,7 +628,10 @@ describe('Authorization Resource Server API', () => {
 
       try {
         // Search for the policy by name
-        const policy = await sdk.resourceServer.searchPolicy(clientId, testPolicy.name);
+        const policy = await sdk.authorizationServices.policies.searchPolicy(
+          clientId,
+          testPolicy.name
+        );
 
         // Verify policy was found
         expect(policy).toBeDefined();
@@ -615,7 +645,7 @@ describe('Authorization Resource Server API', () => {
     it('should get policy providers', async () => {
       try {
         // Get policy providers
-        const providers = await sdk.resourceServer.getPolicyProviders(clientId);
+        const providers = await sdk.authorizationServices.policies.getPolicyProviders(clientId);
 
         // Verify providers were retrieved
         expect(providers).toBeDefined();
@@ -636,7 +666,6 @@ describe('Authorization Resource Server API', () => {
     });
 
     it('should delete a policy', async () => {
-      // Skip if policy ID is not defined
       if (!policyId) {
         throw new Error('Policy ID not defined');
       }
@@ -648,11 +677,12 @@ describe('Authorization Resource Server API', () => {
           `/clients/${clientId}/authz/resource-server/policy/${policyId}`,
           'DELETE'
         );
-        console.log(`Deleted policy with ID: ${policyId}`);
 
         // Try to get the deleted policy - should return empty array or throw an error
         try {
-          const policies = await sdk.resourceServer.getPolicies(clientId, { policyId });
+          const policies = await sdk.authorizationServices.policies.getPolicies(clientId, {
+            policyId
+          });
           expect(policies.length).toBe(0);
         } catch (error) {
           // Expected error - policy should not exist

@@ -15,7 +15,8 @@ import { RolesApi } from './api/roles/roles';
 import { RoleMappingsApiFactory } from './api/role-mappings';
 import { ScopeMappingsApiFactory } from './api/scope-mappings';
 import { KeysApi } from './api/keys';
-import { ResourceServerApi } from './api/authorization';
+import { AuthorizationServicesApi } from './api/authorization/authorization-services';
+import { ComponentApi } from './api/component';
 import { KeycloakConfig } from './types/auth';
 import { getToken } from './utils/auth';
 import { HttpMethod, makeRequest } from './utils/request';
@@ -42,7 +43,8 @@ class KeycloakAdminSDK {
   public roleMappings: RoleMappingsApiFactory;
   public scopeMappings: ScopeMappingsApiFactory;
   public keys: KeysApi;
-  public resourceServer: ResourceServerApi;
+  public authorizationServices: AuthorizationServicesApi;
+  public component: ComponentApi;
 
   /**
    * Creates a new instance of the Keycloak Admin SDK
@@ -67,7 +69,8 @@ class KeycloakAdminSDK {
     this.roleMappings = new RoleMappingsApiFactory(this);
     this.scopeMappings = new ScopeMappingsApiFactory(this);
     this.keys = new KeysApi(this);
-    this.resourceServer = new ResourceServerApi(this);
+    this.authorizationServices = new AuthorizationServicesApi(this);
+    this.component = new ComponentApi(this);
   }
 
   /**
@@ -100,7 +103,8 @@ class KeycloakAdminSDK {
    * @param {string} endpoint - The API endpoint to call
    * @param {HttpMethod} method - The HTTP method to use
    * @param {any} [body] - Optional request body
-   * @param {Record<string, any>} [queryParams] - Optional query parameters
+   * @param options Overrides default HTTP headers
+
    * @returns {Promise<T>} The response data
    */
   async request<T>(
@@ -142,6 +146,7 @@ class KeycloakAdminSDK {
    * @param {string} endpoint - The API endpoint to call
    * @param {HttpMethod} method - The HTTP method to use
    * @param {any} [body] - Optional request body
+   * @param options Overrides default HTTP headers
    * @returns {Promise<T>} The response data
    */
   async requestWithoutRealm<T>(
@@ -154,7 +159,7 @@ class KeycloakAdminSDK {
       const token = await this.getValidToken();
       const url = `${this.adminUrl}/realms${endpoint}`;
 
-      return makeRequest<T>(url, method, token, body);
+      return makeRequest<T>(url, method, token, body, options);
     } catch (error) {
       console.error(`Request without realm failed for endpoint ${endpoint}:`, error);
       throw error;
@@ -169,6 +174,7 @@ class KeycloakAdminSDK {
    * @param {string} endpoint - The API endpoint to call
    * @param {HttpMethod} method - The HTTP method to use
    * @param {any} [body] - Optional request body
+   * @param options Overrides default HTTP headers
    * @returns {Promise<T>} The response data
    */
   async requestForRealm<T>(
@@ -181,7 +187,7 @@ class KeycloakAdminSDK {
     try {
       const token = await this.getValidToken();
       const url = `${this.adminUrl}/realms/${realmName}${endpoint}`;
-      return makeRequest<T>(url, method, token, body);
+      return makeRequest<T>(url, method, token, body, options);
     } catch (error) {
       console.error(`Request for realm ${realmName} failed for endpoint ${endpoint}:`, error);
       throw error;

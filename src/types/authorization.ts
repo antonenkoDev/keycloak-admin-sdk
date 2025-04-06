@@ -19,7 +19,7 @@ export interface ResourceServerRepresentation {
  * Represents a resource in Keycloak Authorization Services
  */
 export interface ResourceRepresentation {
-  id?: string;
+  _id?: string;
   name?: string;
   displayName?: string;
   type?: string;
@@ -33,6 +33,10 @@ export interface ResourceRepresentation {
     name?: string;
   };
   ownerManagedAccess?: boolean;
+}
+
+export interface ResourceRepresentationResponse extends ResourceRepresentation {
+  _id: string;
 }
 
 /**
