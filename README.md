@@ -7,8 +7,10 @@ A TypeScript SDK for interacting with the Keycloak Admin REST API.
 - Comprehensive TypeScript definitions for Keycloak Admin API entities
 - Support for all major Keycloak Admin REST API endpoints
 - Clean, SOLID-based architecture
-- Proper error handling and validation
-- End-to-end testing capabilities
+- Enhanced error handling and debugging capabilities
+- Optimized resource creation with ID extraction from Location headers
+- Comprehensive APIs for Organizations, Scope Mappings, and Role Mappings
+- End-to-end testing capabilities with robust error handling
 
 ## Installation
 
@@ -57,8 +59,13 @@ The SDK provides the following main API classes:
 - `GroupsApi`: Methods for managing groups
 - `RealmsApi`: Methods for managing realms
 - `ClientsApi`: Methods for managing clients
+- `OrganizationsApi`: Methods for managing organizations and their members
+- `RolesApi`: Methods for managing roles and composite roles
+- `RoleMappingsApi`: Methods for managing role mappings for users and groups
+- `ScopeMappingsApi`: Methods for managing scope mappings for clients and client scopes
+- `ComponentApi`: Methods for managing components
 
-Each API class provides methods for CRUD operations and more specialized functionality.
+Each API class provides methods for CRUD operations and more specialized functionality, with robust error handling and detailed logging for easier debugging.
 
 ## End-to-End Testing
 
@@ -113,6 +120,10 @@ Check the `examples` directory for more usage examples:
 - Realm management
 - Client management
 - User and group operations
+- Organization management
+- Role and role mappings management
+- Scope mappings management
+- Error handling and debugging techniques
 
 ## Contributing
 
