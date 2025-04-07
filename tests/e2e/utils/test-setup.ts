@@ -487,12 +487,11 @@ export async function cleanupTestEnvironment(context: TestContext): Promise<void
       realm: 'master' // Always use master realm for administrative operations
     });
 
-    // Delete the test realm using the admin SDK
+    //  Test realm should be deleted during tests.
+    //  In case of failures, force delete.
     try {
       await adminSdk.realms.delete(realmName);
-    } catch (error) {
-      console.error(`Failed to delete realm ${realmName}:`, error);
-    }
+    } catch (error) {}
   } catch (error) {
     console.error('Error during test cleanup:', error);
     throw error;

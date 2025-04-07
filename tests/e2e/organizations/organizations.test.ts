@@ -107,17 +107,13 @@ describe('Organizations API E2E Tests', () => {
 
       if (identityProviderAlias) {
         try {
-          // Delete the identity provider
+          // Ensure identity provider deleted
           await sdk.requestForRealm(
             testContext.realmName,
             `/identity-providers/instances/${identityProviderAlias}`,
             'DELETE'
           );
-        } catch (error) {
-          console.error(
-            `Failed to delete identity provider: ${error instanceof Error ? error.message : String(error)}`
-          );
-        }
+        } catch (error) {}
       }
 
       if (organizationId) {

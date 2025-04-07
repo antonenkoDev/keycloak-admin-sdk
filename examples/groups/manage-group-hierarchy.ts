@@ -1,279 +1,323 @@
 /**
- * Example: Manage group hierarchy
- * 
- * This example demonstrates how to create and manage a complex group hierarchy
- * including nested subgroups and permissions using the Keycloak Admin SDK.
+ * Group Hierarchy Management Example
+ *
+ * This example demonstrates how to create and manage a simple group hierarchy
+ * with nested subgroups using the Keycloak Admin SDK.
+ *
+ * Features:
+ * - ID extraction directly from Location headers in HTTP 201 responses
+ * - Basic error handling with informative messages
+ * - Environment variable configuration
  */
 
-// Configuration for Keycloak SDK
-import { KeycloakConfig } from "../../src/types/auth";
-import KeycloakAdminSDK from "../../src";
-import { GroupRepresentation } from "../../src/types/groups";
+import { KeycloakConfig } from '../../src/types/auth';
+import KeycloakAdminSDK from '../../src';
+import { GroupRepresentation } from '../../src/types/groups';
+import dotenv from 'dotenv'; // Load environment variables from .env file
 
+// Load environment variables from .env file
+dotenv.config();
+
+// Create configuration object with proper typing and environment variables
 const config: KeycloakConfig = {
-    baseUrl: 'http://localhost:8080',
-    realm: 'your-realm',
-    authMethod: 'client',
-    credentials: {
-        clientId: 'your-client-id',
-        clientSecret: 'your-client-secret',
-    },
+  baseUrl: process.env.KEYCLOAK_BASE_URL || 'http://localhost:8080',
+  realm: process.env.KEYCLOAK_REALM || 'master',
+  authMethod: 'password',
+  credentials: {
+    clientId: process.env.KEYCLOAK_CLIENT_ID || 'admin-cli',
+    username: process.env.KEYCLOAK_ADMIN_USERNAME || 'admin',
+    password: process.env.KEYCLOAK_ADMIN_PASSWORD || 'admin'
+  }
 };
 
 // Instantiate Keycloak SDK
 const sdk = new KeycloakAdminSDK(config);
 
 /**
- * Create a complete organizational structure with nested groups
- * This demonstrates creating a complex hierarchy in a single operation
+ * Create a simple group hierarchy with a parent group and child groups
  */
-async function createOrganizationalStructure(): Promise<void> {
-    try {
-        // Create the top-level "Company" group
-        const companyGroup: GroupRepresentation = {
-            name: 'Company',
-            attributes: {
-                'type': ['Organization'],
-                'established': ['2020']
-            }
-        };
-        
-        await sdk.groups.create(companyGroup);
+async function createGroupHierarchy(): Promise<void> {
+  try {
+    console.log('Creating group hierarchy...');
 
-        // Find the Company group to get its ID
-        const groups = await sdk.groups.list();
-        const companyGroupObj = groups.find(g => g.name === 'Company');
-        
-        if (!companyGroupObj || !companyGroupObj.id) {
-            throw new Error('Failed to find Company group after creation');
-        }
-        
-        const companyGroupId = companyGroupObj.id;
-        
-        // Create department groups under Company
-        const departments = [
-            {
-                name: 'Engineering',
-                attributes: { 'department': ['Technical'], 'headcount': ['150'] }
-            },
-            {
-                name: 'Marketing',
-                attributes: { 'department': ['Business'], 'headcount': ['45'] }
-            },
-            {
-                name: 'Finance',
-                attributes: { 'department': ['Business'], 'headcount': ['30'] }
-            },
-            {
-                name: 'Human Resources',
-                attributes: { 'department': ['Operations'], 'headcount': ['25'] }
-            }
-        ];
-        
-        // Create all department groups
-        const departmentIds: Record<string, string> = {};
-        
-        for (const dept of departments) {
-            await sdk.groups.createChild(companyGroupId, dept);
-            
-        }
-        
-        // Get updated company group with subgroups
-        const updatedCompanyGroup = await sdk.groups.get(companyGroupId);
-        
-        // Store department IDs for later use
-        if (updatedCompanyGroup.subGroups) {
-            for (const dept of updatedCompanyGroup.subGroups) {
-                if (dept.name && dept.id) {
-                    departmentIds[dept.name] = dept.id;
-                }
-            }
-        }
-        
-        // Create teams under Engineering department
-        if (departmentIds['Engineering']) {
-            const engineeringTeams = [
-                {
-                    name: 'Frontend',
-                    attributes: { 'team': ['Development'], 'stack': ['React', 'TypeScript'] }
-                },
-                {
-                    name: 'Backend',
-                    attributes: { 'team': ['Development'], 'stack': ['Node.js', 'Java'] }
-                },
-                {
-                    name: 'DevOps',
-                    attributes: { 'team': ['Operations'], 'stack': ['Kubernetes', 'Docker'] }
-                },
-                {
-                    name: 'QA',
-                    attributes: { 'team': ['Quality'], 'stack': ['Selenium', 'Jest'] }
-                }
-            ];
-            
-            for (const team of engineeringTeams) {
-                await sdk.groups.createChild(departmentIds['Engineering'], team);
-                
-            }
-        }
-        
-        // Create teams under Marketing department
-        if (departmentIds['Marketing']) {
-            const marketingTeams = [
-                {
-                    name: 'Digital',
-                    attributes: { 'team': ['Marketing'], 'focus': ['Online'] }
-                },
-                {
-                    name: 'Content',
-                    attributes: { 'team': ['Marketing'], 'focus': ['Blog', 'Social'] }
-                }
-            ];
-            
-            for (const team of marketingTeams) {
-                await sdk.groups.createChild(departmentIds['Marketing'], team);
-                
-            }
-        }
-        
-        
-    } catch (error) {
-        console.error('Error creating organizational structure:', 
-            error instanceof Error ? error.message : String(error));
-        throw error;
+    // 1. Create a parent group
+    const parentGroup: GroupRepresentation = {
+      name: 'Company',
+      attributes: {
+        type: ['Organization'],
+        created: [new Date().toISOString()]
+      }
+    };
+
+    // Create the parent group and extract ID from Location header
+    const parentId = await sdk.groups.create(parentGroup);
+    console.log(`Parent group created with ID: ${parentId}`);
+
+    // 2. Create department subgroups
+    const departments = [
+      {
+        name: 'Engineering',
+        attributes: { department: ['Technical'], created: [new Date().toISOString()] }
+      },
+      {
+        name: 'Marketing',
+        attributes: { department: ['Business'], created: [new Date().toISOString()] }
+      }
+    ];
+
+    // Create each department as a child of the parent group
+    for (const department of departments) {
+      try {
+        await sdk.groups.createChild(parentId, department);
+        console.log(`Created department: ${department.name}`);
+      } catch (error) {
+        console.error(
+          `Error creating department ${department.name}:`,
+          error instanceof Error ? error.message : String(error)
+        );
+      }
     }
+
+    // 3. Get the created structure to verify
+    const group = await sdk.groups.get(parentId);
+    console.log('\nCreated group hierarchy:');
+    console.log(JSON.stringify(group, null, 2));
+  } catch (error) {
+    console.error('Error creating group hierarchy:');
+    if (error instanceof Error) {
+      console.error(`- Message: ${error.message}`);
+    } else {
+      console.error(error);
+    }
+  }
 }
 
 /**
- * Display the complete group hierarchy in a tree-like format
+ * Display a group and its subgroups
+ *
+ * @param groupId - The ID of the group to display
  */
-async function displayGroupHierarchy(): Promise<void> {
-    try {
-        // Get all groups with full hierarchy
-        const groups = await sdk.groups.list({ 
-            briefRepresentation: false,
-            populateHierarchy: true
-        });
-        
-        
-        
-        // Display groups in a tree-like structure
-        function printGroup(group: GroupRepresentation, level: number = 0): void {
-            const indent = '  '.repeat(level);
-            const prefix = level > 0 ? '└─ ' : '';
-            
-            
-            // Print attributes if they exist
-            if (group.attributes && Object.keys(group.attributes).length > 0) {
-                console.log(`${indent}   Attributes: ${JSON.stringify(group.attributes)}`);
-            }
-            
-            // Print subgroups recursively
-            if (group.subGroups && group.subGroups.length > 0) {
-                group.subGroups.forEach(subGroup => {
-                    printGroup(subGroup, level + 1);
-                });
-            }
-        }
-        
-        // Print each top-level group and its hierarchy
-        groups.forEach(group => {
-            printGroup(group);
-        });
-    } catch (error) {
-        console.error('Error displaying group hierarchy:', 
-            error instanceof Error ? error.message : String(error));
+async function displayGroup(groupId: string): Promise<void> {
+  if (!groupId) {
+    console.error('Group ID is required');
+    return;
+  }
+
+  try {
+    console.log(`Fetching group with ID: ${groupId}`);
+    const group = await sdk.groups.get(groupId);
+
+    console.log('\nGroup details:');
+    console.log(`Name: ${group.name}`);
+    console.log(`ID: ${group.id}`);
+
+    if (group.attributes) {
+      console.log('\nAttributes:');
+      for (const [key, values] of Object.entries(group.attributes)) {
+        console.log(`- ${key}: ${values.join(', ')}`);
+      }
     }
+
+    if (group.subGroups && group.subGroups.length > 0) {
+      console.log('\nSubgroups:');
+      for (const subGroup of group.subGroups) {
+        console.log(`- ${subGroup.name} (ID: ${subGroup.id})`);
+      }
+    } else {
+      console.log('\nNo subgroups found.');
+    }
+  } catch (error) {
+    console.error('Error displaying group:');
+    if (error instanceof Error) {
+      console.error(`- ${error.message}`);
+    } else {
+      console.error(error);
+    }
+  }
+}
+
+/**
+ * Display the complete group hierarchy with attributes
+ *
+ * @param sdk - Initialized KeycloakAdminSDK instance
+ * @param groupId - The ID of the top-level group to display
+ * @returns Promise that resolves when the hierarchy has been displayed
+ */
+async function displayGroupHierarchy(sdk: KeycloakAdminSDK, groupId: string): Promise<void> {
+  if (!groupId) {
+    console.error('Group ID is required to display hierarchy');
+    return;
+  }
+
+  console.log(`Displaying group hierarchy for group with ID: ${groupId}`);
+
+  try {
+    // Get the group with all subgroups
+    const group = await sdk.groups.get(groupId);
+    console.log('\nGroup Hierarchy:');
+    console.log('===============');
+
+    // Print the group hierarchy recursively
+    printGroup(group);
+
+    /**
+     * Helper function to print groups recursively in a tree-like format
+     *
+     * @param group - The group to print
+     * @param level - The nesting level (for indentation)
+     */
+    function printGroup(group: GroupRepresentation, level: number = 0): void {
+      if (!group) return;
+
+      // Create indentation based on level
+      const indent = '  '.repeat(level);
+
+      // Print group name and ID
+      console.log(
+        `${indent}${level > 0 ? '└─ ' : ''}${group.name || 'Unnamed Group'} (ID: ${group.id || 'Unknown'})`
+      );
+
+      // Print group attributes if they exist
+      if (group.attributes && Object.keys(group.attributes).length > 0) {
+        console.log(`${indent}   Attributes:`);
+
+        for (const [key, values] of Object.entries(group.attributes)) {
+          if (Array.isArray(values) && values.length > 0) {
+            console.log(`${indent}     - ${key}: ${values.join(', ')}`);
+          }
+        }
+      }
+
+      // Print subgroups recursively
+      if (group.subGroups && group.subGroups.length > 0) {
+        console.log(`${indent}   Subgroups:`);
+        for (const subGroup of group.subGroups) {
+          printGroup(subGroup, level + 1);
+        }
+      }
+    }
+
+    console.log('\nHierarchy display completed.');
+  } catch (error) {
+    console.error('Error displaying group hierarchy:');
+    if (error instanceof Error) {
+      console.error(`- Message: ${error.message}`);
+    } else {
+      console.error(error);
+    }
+  }
 }
 
 /**
  * Set management permissions for a group
- * 
+ *
  * @param groupId - The ID of the group
  */
 async function setGroupPermissions(groupId: string): Promise<void> {
-    try {
-        // Get current permissions
-        const currentPermissions = await sdk.groups.getManagementPermissions(groupId);
-        console.log('Current permissions:', JSON.stringify(currentPermissions, null, 2));
-        
-        // Enable permissions
-        const updatedPermissions = {
-            enabled: true,
-            resource: currentPermissions.resource,
-            scopePermissions: currentPermissions.scopePermissions
-        };
-        
-        const result = await sdk.groups.setManagementPermissions(groupId, updatedPermissions);
-        console.log('Updated permissions:', JSON.stringify(result, null, 2));
-    } catch (error) {
-        console.error('Error setting group permissions:', 
-            error instanceof Error ? error.message : String(error));
+  if (!groupId) {
+    console.error('Group ID is required');
+    return;
+  }
+
+  try {
+    // Get current permissions
+    const currentPermissions = await sdk.groups.getManagementPermissions(groupId);
+    console.log('Current permissions:', JSON.stringify(currentPermissions, null, 2));
+
+    // Enable permissions
+    const updatedPermissions = {
+      enabled: true,
+      resource: currentPermissions.resource,
+      scopePermissions: currentPermissions.scopePermissions
+    };
+
+    const result = await sdk.groups.setManagementPermissions(groupId, updatedPermissions);
+    console.log('Updated permissions:', JSON.stringify(result, null, 2));
+  } catch (error) {
+    console.error('Error setting group permissions:');
+    if (error instanceof Error) {
+      console.error(`- ${error.message}`);
+    } else {
+      console.error(error);
     }
+  }
 }
 
 /**
- * Clean up by deleting the organizational structure
+ * Clean up by deleting a group
+ *
+ * @param groupId - The ID of the group to delete
  */
-async function cleanupOrganizationalStructure(): Promise<void> {
-    try {
-        // Find the Company group
-        const groups = await sdk.groups.list();
-        const companyGroup = groups.find(g => g.name === 'Company');
-        
-        if (companyGroup && companyGroup.id) {
-            // Delete the Company group (this will delete all subgroups as well)
-            await sdk.groups.delete(companyGroup.id);
-            
-        } else {
-            
-        }
-    } catch (error) {
-        console.error('Error cleaning up organizational structure:', 
-            error instanceof Error ? error.message : String(error));
+async function deleteGroup(groupId: string): Promise<void> {
+  if (!groupId) {
+    console.error('Group ID is required');
+    return;
+  }
+
+  try {
+    console.log(`Deleting group with ID: ${groupId}`);
+    await sdk.groups.delete(groupId);
+    console.log('Group deleted successfully');
+  } catch (error) {
+    console.error('Error deleting group:');
+    if (error instanceof Error) {
+      console.error(`- ${error.message}`);
+    } else {
+      console.error(error);
     }
+  }
 }
 
-// Main execution
-(async () => {
-    try {
-        // Check if Company group already exists
-        const existingGroups = await sdk.groups.list();
-        const companyExists = existingGroups.some(g => g.name === 'Company');
-        
-        if (companyExists) {
-            
-            await cleanupOrganizationalStructure();
-        }
-        
-        // Create the organizational structure
-        await createOrganizationalStructure();
-        
-        // Display the complete hierarchy
-        await displayGroupHierarchy();
-        
-        // Set permissions on the Engineering group
-        const groups = await sdk.groups.list();
-        const companyGroup = groups.find(g => g.name === 'Company');
-        
-        if (companyGroup && companyGroup.id) {
-            // Get the updated company group with subgroups
-            const updatedCompanyGroup = await sdk.groups.get(companyGroup.id);
-            
-            if (updatedCompanyGroup.subGroups) {
-                const engineeringGroup = updatedCompanyGroup.subGroups.find(g => g.name === 'Engineering');
-                
-                if (engineeringGroup && engineeringGroup.id) {
-                    
-                    await setGroupPermissions(engineeringGroup.id);
-                }
-            }
-        }
-        
-        // Uncomment the following line if you want to clean up after running the example
-        // await cleanupOrganizationalStructure();
-        
-    } catch (error) {
-        console.error('Error in main execution:', error instanceof Error ? error.message : String(error));
+/**
+ * Main execution function
+ */
+async function main(): Promise<void> {
+  console.log('Starting Group Management Example');
+  console.log('-------------------------------');
+  console.log(`Using Keycloak at: ${config.baseUrl}`);
+  console.log(`Realm: ${config.realm}`);
+
+  let parentGroupId: string | undefined;
+
+  try {
+    // Step 1: Create a group hierarchy
+    await createGroupHierarchy();
+
+    // Step 2: List all groups to find our created group
+    console.log('\nListing all groups:');
+    const groups = await sdk.groups.list();
+    const parentGroup = groups.find(g => g.name === 'Company');
+
+    if (parentGroup && parentGroup.id) {
+      parentGroupId = parentGroup.id;
+
+      // Step 3: Display the group details
+      await displayGroup(parentGroupId);
+
+      // Step 4: Set permissions on the parent group
+      await setGroupPermissions(parentGroupId);
+
+      // Step 5: Clean up (commented out by default)
+      // Uncomment the following line if you want to clean up after running the example
+      // await deleteGroup(parentGroupId);
+    } else {
+      console.log('Parent group not found');
     }
-})();
+
+    console.log('\nExample completed successfully!');
+  } catch (error) {
+    console.error('Error in main execution:');
+    if (error instanceof Error) {
+      console.error(`- ${error.message}`);
+    } else {
+      console.error(error);
+    }
+  }
+}
+
+// Execute the main function
+main().catch(error => {
+  console.error('Unhandled error in main execution:');
+  console.error(error);
+  process.exit(1);
+});

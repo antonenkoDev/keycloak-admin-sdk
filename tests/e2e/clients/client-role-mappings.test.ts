@@ -5,7 +5,7 @@
  * a running Keycloak server, following SOLID principles and clean code practices.
  */
 
-import KeycloakAdminSDK from '../../../src/index';
+import KeycloakAdminSDK from '../../../src';
 import { RoleRepresentation } from '../../../src/types/roles';
 import {
   cleanupTestEnvironment,
@@ -135,11 +135,11 @@ describe('Client Role Mappings API E2E Tests', () => {
 
           // Add client role to user
 
-          await sdk.clientRoleMappings.addUserClientRoleMappings(userId, clientId, [role]);
+          await sdk.clients.clientRoleMappings.addUserClientRoleMappings(userId, clientId, [role]);
 
           // Verify role was added
 
-          const userRoles = await sdk.clientRoleMappings.getUserClientRoleMappings(
+          const userRoles = await sdk.clients.clientRoleMappings.getUserClientRoleMappings(
             userId,
             clientId
           );
@@ -185,10 +185,8 @@ describe('Client Role Mappings API E2E Tests', () => {
         }
 
         // Get available roles
-        const availableRoles = await sdk.clientRoleMappings.getAvailableUserClientRoleMappings(
-          userId,
-          clientId
-        );
+        const availableRoles =
+          await sdk.clients.clientRoleMappings.getAvailableUserClientRoleMappings(userId, clientId);
 
         // Verify response is an array
         expect(Array.isArray(availableRoles)).toBe(true);
@@ -221,10 +219,8 @@ describe('Client Role Mappings API E2E Tests', () => {
         }
 
         // Get effective roles
-        const effectiveRoles = await sdk.clientRoleMappings.getEffectiveUserClientRoleMappings(
-          userId,
-          clientId
-        );
+        const effectiveRoles =
+          await sdk.clients.clientRoleMappings.getEffectiveUserClientRoleMappings(userId, clientId);
 
         // Verify response is an array
         expect(Array.isArray(effectiveRoles)).toBe(true);
@@ -265,10 +261,13 @@ describe('Client Role Mappings API E2E Tests', () => {
         await sdk.clients.createRole(clientId, roleRepresentation);
         const role = await sdk.clients.getRole(clientId, 'test-role');
         // Delete role from user
-        await sdk.clientRoleMappings.deleteUserClientRoleMappings(userId, clientId, [role]);
+        await sdk.clients.clientRoleMappings.deleteUserClientRoleMappings(userId, clientId, [role]);
 
         // Verify role was removed
-        const userRoles = await sdk.clientRoleMappings.getUserClientRoleMappings(userId, clientId);
+        const userRoles = await sdk.clients.clientRoleMappings.getUserClientRoleMappings(
+          userId,
+          clientId
+        );
 
         // Check if role no longer exists in user's role mappings
         const hasRole = userRoles.some(r => r.id === role.id);
@@ -311,10 +310,10 @@ describe('Client Role Mappings API E2E Tests', () => {
         const role = await sdk.clients.getRole(clientId, 'group-role');
 
         // Add client role to group
-        await sdk.clientRoleMappings.addGroupClientRoleMappings(groupId, clientId, [role]);
+        await sdk.clients.clientRoleMappings.addGroupClientRoleMappings(groupId, clientId, [role]);
 
         // Verify role was added
-        const groupRoles = await sdk.clientRoleMappings.getGroupClientRoleMappings(
+        const groupRoles = await sdk.clients.clientRoleMappings.getGroupClientRoleMappings(
           groupId,
           clientId
         );
@@ -351,10 +350,11 @@ describe('Client Role Mappings API E2E Tests', () => {
         }
 
         // Get available roles
-        const availableRoles = await sdk.clientRoleMappings.getAvailableGroupClientRoleMappings(
-          groupId,
-          clientId
-        );
+        const availableRoles =
+          await sdk.clients.clientRoleMappings.getAvailableGroupClientRoleMappings(
+            groupId,
+            clientId
+          );
 
         // Verify response is an array
         expect(Array.isArray(availableRoles)).toBe(true);
@@ -387,10 +387,11 @@ describe('Client Role Mappings API E2E Tests', () => {
         }
 
         // Get effective roles
-        const effectiveRoles = await sdk.clientRoleMappings.getEffectiveGroupClientRoleMappings(
-          groupId,
-          clientId
-        );
+        const effectiveRoles =
+          await sdk.clients.clientRoleMappings.getEffectiveGroupClientRoleMappings(
+            groupId,
+            clientId
+          );
 
         // Verify response is an array
         expect(Array.isArray(effectiveRoles)).toBe(true);
@@ -426,10 +427,12 @@ describe('Client Role Mappings API E2E Tests', () => {
         const role = await sdk.clients.getRole(clientId, 'group-role');
 
         // Delete role from group
-        await sdk.clientRoleMappings.deleteGroupClientRoleMappings(groupId, clientId, [role]);
+        await sdk.clients.clientRoleMappings.deleteGroupClientRoleMappings(groupId, clientId, [
+          role
+        ]);
 
         // Verify role was removed
-        const groupRoles = await sdk.clientRoleMappings.getGroupClientRoleMappings(
+        const groupRoles = await sdk.clients.clientRoleMappings.getGroupClientRoleMappings(
           groupId,
           clientId
         );

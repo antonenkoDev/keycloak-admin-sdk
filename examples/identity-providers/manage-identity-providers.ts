@@ -38,11 +38,6 @@ async function main() {
 
     const sdk = new KeycloakAdminSDK(config);
 
-    // Get all available identity provider types
-
-    const providerTypes = await sdk.identityProviders.getProviderTypes();
-    console.log(`Available provider types: ${Object.keys(providerTypes).join(', ')}`);
-
     // Get the OIDC provider factory details
 
     const oidcFactory = await sdk.identityProviders.getProviderFactory('oidc');
@@ -100,13 +95,14 @@ async function main() {
 
       const mapperTypes = await sdk.identityProviders.getMapperTypes(newProviderAlias);
 
-      mapperTypes.forEach((type, index) => {
+      const mapperTypesArray = Object.values(mapperTypes);
+      mapperTypesArray.forEach((type, index) => {
         console.log(`${index + 1}. ${type.name} (${type.id})`);
       });
 
       // Create a mapper for the provider
-      if (mapperTypes.length > 0) {
-        const mapperType = mapperTypes[0]; // Use the first available mapper type
+      if (mapperTypesArray.length > 0) {
+        const mapperType = mapperTypesArray[0]; // Use the first available mapper type
         const mapper: IdentityProviderMapperRepresentation = {
           name: 'example-mapper',
           identityProviderAlias: newProviderAlias,

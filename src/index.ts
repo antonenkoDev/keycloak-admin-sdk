@@ -7,12 +7,11 @@ import { UsersApi } from './api/users/users';
 import { GroupsApi } from './api/groups';
 import { RealmsApi } from './api/realms/realms';
 import { ClientsApi } from './api/clients';
-import { ClientScopesApi } from './api/client-scopes/client-scopes';
-import { ClientRoleMappingsApi } from './api/client-role-mappings/client-role-mappings';
 import { OrganizationsApi } from './api/organizations/organizations';
 import { IdentityProvidersApi } from './api/identity-providers/identity-providers';
 import { RolesApi } from './api/roles/roles';
 import { RoleMappingsApiFactory } from './api/role-mappings';
+import { AttackDetectionApi } from './api/attack-detection';
 import { ScopeMappingsApiFactory } from './api/scope-mappings';
 import { KeysApi } from './api/keys';
 import { AuthorizationServicesApi } from './api/authorization/authorization-services';
@@ -35,8 +34,6 @@ class KeycloakAdminSDK {
   public groups: GroupsApi;
   public realms: RealmsApi;
   public clients: ClientsApi;
-  public clientScopes: ClientScopesApi;
-  public clientRoleMappings: ClientRoleMappingsApi;
   public organizations: OrganizationsApi;
   public identityProviders: IdentityProvidersApi;
   public roles: RolesApi;
@@ -45,6 +42,7 @@ class KeycloakAdminSDK {
   public keys: KeysApi;
   public authorizationServices: AuthorizationServicesApi;
   public component: ComponentApi;
+  public attackDetection: AttackDetectionApi;
 
   /**
    * Creates a new instance of the Keycloak Admin SDK
@@ -61,8 +59,6 @@ class KeycloakAdminSDK {
     this.groups = new GroupsApi(this);
     this.realms = new RealmsApi(this);
     this.clients = new ClientsApi(this);
-    this.clientScopes = new ClientScopesApi(this);
-    this.clientRoleMappings = new ClientRoleMappingsApi(this);
     this.organizations = new OrganizationsApi(this);
     this.identityProviders = new IdentityProvidersApi(this);
     this.roles = new RolesApi(this);
@@ -71,6 +67,7 @@ class KeycloakAdminSDK {
     this.keys = new KeysApi(this);
     this.authorizationServices = new AuthorizationServicesApi(this);
     this.component = new ComponentApi(this);
+    this.attackDetection = new AttackDetectionApi(this);
   }
 
   /**

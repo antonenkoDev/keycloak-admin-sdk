@@ -61,7 +61,7 @@ describe('Scope Mappings API E2E Tests', () => {
       description: 'Test client scope for scope mappings API tests'
     };
 
-    clientScopeId = await sdk.clientScopes.create(testClientScope);
+    clientScopeId = await sdk.clients.clientScopes.create(testClientScope);
 
     // Create a test role
     const testRole = {
@@ -94,7 +94,7 @@ describe('Scope Mappings API E2E Tests', () => {
     }
 
     if (clientScopeId) {
-      await sdk.clientScopes.delete(clientScopeId);
+      await sdk.clients.clientScopes.delete(clientScopeId);
     }
 
     if (role && role.name) {

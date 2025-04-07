@@ -8,6 +8,7 @@
 import {
   cleanupTestEnvironment,
   createTestClient,
+  createTestGroup,
   generateUniqueName,
   setupTestEnvironment,
   TEST_TIMEOUT,
@@ -22,7 +23,7 @@ describe('Groups and Users API E2E Tests', () => {
 
   // Setup test environment before all tests
   beforeAll(async () => {
-    // Create test realm and client
+    // Create2 test realm and client
     testContext = await setupTestEnvironment();
     testContext = await createTestClient(testContext);
 
@@ -131,6 +132,46 @@ describe('Groups and Users API E2E Tests', () => {
     expect(retrievedGroup).toBeDefined();
     expect(retrievedGroup.name).toBe(`${group.name}-updated`);
     expect(retrievedGroup.attributes?.['updated-attribute']).toContain('updated-value');
+  });
+
+  test('should manage group permissions', async () => {
+    if (!testContext.groupIds || testContext.groupIds.length === 0) {
+      throw new Error('No test group available');
+    }
+
+    const groupId = testContext.groupIds[0];
+
+    // Get the current group
+    const group = await testContext.sdk.groups.get(groupId);
+
+    // Get initial permissions
+    const initialPerms = await testContext.sdk.groups.getManagementPermissions(group.id);
+
+    // Update permissions
+    const newPerms = { ...initialPerms, enabled: true };
+    const updatedPerms = await testContext.sdk.groups.setManagementPermissions(group.id, newPerms);
+
+    expect(updatedPerms.enabled).toBe(true);
+  });
+
+  test('should create a group child', async () => {
+    if (!testContext.groupIds || testContext.groupIds.length === 0) {
+      throw new Error('No test group available');
+    }
+
+    const groupId = testContext.groupIds[0];
+
+    // Get the current group
+    const parentGroup = await testContext.sdk.groups.get(groupId);
+    const childGroup = { name: 'child-group' };
+
+    // Create child group
+    await testContext.sdk.groups.createChild(parentGroup.id, childGroup);
+
+    // Verify hierarchy
+    const children = await testContext.sdk.groups.getChildren(parentGroup.id);
+    expect(children).toHaveLength(1);
+    expect(children[0].name).toBe(childGroup.name);
   });
 
   /**
@@ -329,6 +370,18 @@ describe('Groups and Users API E2E Tests', () => {
 
     const groupMember = members.find(member => member.id === userId);
     expect(groupMember).toBeUndefined();
+  });
+
+  test('should count groups correctly', async () => {
+    if (!testContext.groupIds || testContext.groupIds.length === 0) {
+      throw new Error('No test group available');
+    }
+
+    // Get the current group
+    const initialCount = await testContext.sdk.groups.count();
+    await createTestGroup(testContext.sdk);
+    const newCount = await testContext.sdk.groups.count();
+    expect(newCount).toBe(initialCount + 1);
   });
 
   /**

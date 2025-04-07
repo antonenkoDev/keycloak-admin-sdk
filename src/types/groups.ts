@@ -6,64 +6,68 @@
  * Represents a Keycloak group
  */
 export interface GroupRepresentation {
-    id?: string;
-    name?: string;
-    path?: string;
-    parentId?: string;
-    subGroupCount?: number;
-    subGroups?: GroupRepresentation[];
-    attributes?: Record<string, string[]>;
-    realmRoles?: string[];
-    clientRoles?: Record<string, string[]>;
-    access?: Record<string, boolean>;
+  id?: string;
+  name?: string;
+  path?: string;
+  parentId?: string;
+  subGroupCount?: number;
+  subGroups?: GroupRepresentation[];
+  attributes?: Record<string, string[]>;
+  realmRoles?: string[];
+  clientRoles?: Record<string, string[]>;
+  access?: Record<string, boolean>;
+}
+
+export interface GroupRepresentationResponse extends GroupRepresentation {
+  id: string;
 }
 
 /**
  * Parameters for getting groups
  */
 export interface GetGroupsParams {
-    briefRepresentation?: boolean;
-    exact?: boolean;
-    first?: number;
-    max?: number;
-    populateHierarchy?: boolean;
-    q?: string;
-    search?: string;
+  briefRepresentation?: boolean;
+  exact?: boolean;
+  first?: number;
+  max?: number;
+  populateHierarchy?: boolean;
+  q?: string;
+  search?: string;
 }
 
 /**
  * Parameters for getting group count
  */
 export interface GetGroupsCountParams {
-    search?: string;
-    top?: boolean;
+  search?: string;
+  top?: boolean;
 }
 
 /**
  * Parameters for getting group members
  */
 export interface GetGroupMembersParams {
-    briefRepresentation?: boolean;
-    first?: number;
-    max?: number;
+  briefRepresentation?: boolean;
+  first?: number;
+  max?: number;
 }
 
 /**
  * Parameters for getting group children
  */
 export interface GetGroupChildrenParams {
-    briefRepresentation?: boolean;
-    exact?: boolean;
-    first?: number;
-    max?: number;
-    search?: string;
+  briefRepresentation?: boolean;
+  exact?: boolean;
+  first?: number;
+  max?: number;
+  search?: string;
 }
 
 /**
  * Reference for management permissions
  */
 export interface ManagementPermissionReference {
-    enabled?: boolean;
-    resource?: string;
-    scopePermissions?: Record<string, string>;
+  enabled?: boolean;
+  resource?: string;
+  scopePermissions?: Record<string, string>;
 }

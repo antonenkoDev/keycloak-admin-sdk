@@ -5,8 +5,8 @@
  * It follows SOLID principles and clean code practices.
  */
 
-import { RoleRepresentation } from '../../types/roles';
-import KeycloakAdminSDK from '../../index';
+import { RoleRepresentation } from '../../../types/roles';
+import KeycloakAdminSDK from '../../../index';
 
 /**
  * Client Role Mappings API
@@ -130,7 +130,7 @@ export class ClientRoleMappingsApi {
     if (!userId) throw new Error('User ID is required');
     if (!clientId) throw new Error('Client ID is required');
 
-    const queryParams = briefRepresentation !== false ? '' : '?briefRepresentation=false';
+    const queryParams = briefRepresentation ? '' : '?briefRepresentation=false';
 
     return this.sdk.request<RoleRepresentation[]>(
       `/users/${userId}/role-mappings/clients/${clientId}/composite${queryParams}`,
@@ -246,7 +246,7 @@ export class ClientRoleMappingsApi {
     if (!groupId) throw new Error('Group ID is required');
     if (!clientId) throw new Error('Client ID is required');
 
-    const queryParams = briefRepresentation !== false ? '' : '?briefRepresentation=false';
+    const queryParams = briefRepresentation ? '' : '?briefRepresentation=false';
 
     return this.sdk.request<RoleRepresentation[]>(
       `/groups/${groupId}/role-mappings/clients/${clientId}/composite${queryParams}`,

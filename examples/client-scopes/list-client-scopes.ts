@@ -1,6 +1,6 @@
 /**
  * Example: List all client scopes in a realm
- * 
+ *
  * This example demonstrates how to retrieve all client scopes from a Keycloak realm
  * using the Keycloak Admin SDK.
  */
@@ -32,24 +32,19 @@ const sdk = new KeycloakAdminSDK(config);
 async function listClientScopes() {
   try {
     // Get all client scopes
-    
-    const clientScopes = await sdk.clientScopes.findAll();
-    
+
+    const clientScopes = await sdk.clients.clientScopes.findAll();
+
     // Display the client scopes
-    
+
     clientScopes.forEach(scope => {
       console.log(`- ${scope.name} (${scope.id})`);
-      
-      
-      
+
       // Display attributes if available
       if (scope.attributes && Object.keys(scope.attributes).length > 0) {
-        
-        Object.entries(scope.attributes).forEach(([key, value]) => {
-          
-        });
+        Object.entries(scope.attributes).forEach(([key, value]) => {});
       }
-      
+
       // Display protocol mappers if available
       if (scope.protocolMappers && scope.protocolMappers.length > 0) {
         console.log(`  Protocol Mappers (${scope.protocolMappers.length}):`);
@@ -57,8 +52,8 @@ async function listClientScopes() {
           console.log(`    - ${mapper.name} (${mapper.protocol})`);
         });
       }
-      
-       // Empty line for better readability
+
+      // Empty line for better readability
     });
   } catch (error) {
     console.error('Error listing client scopes:', error);

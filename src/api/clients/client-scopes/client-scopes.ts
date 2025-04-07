@@ -3,8 +3,8 @@
  * Provides methods for managing client scopes in Keycloak
  */
 
-import KeycloakAdminSDK from '../../index';
-import { ClientScopeRepresentation, ProtocolMapperRepresentation } from '../../types/clients';
+import KeycloakAdminSDK from '../../../index';
+import { ClientScopeRepresentation, ProtocolMapperRepresentation } from '../../../types/clients';
 
 /**
  * API for managing Keycloak client scopes

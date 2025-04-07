@@ -11,12 +11,41 @@ import {
   UserSessionRepresentation
 } from '../../types/clients';
 import { RoleRepresentation } from '../../types/roles';
+import { ClientCertificatesApi } from './certificates/client-certificates';
+import { ClientInitialAccessApi } from './client-registration/client-initial-access';
+import { ClientRegistrationPolicyApi } from './client-registration/client-registration-policy';
+import { ClientScopesApi } from './client-scopes/client-scopes';
+import { ClientRoleMappingsApi } from './client-role-mappings/client-role-mappings';
 
 /**
  * API for managing Keycloak clients
  */
 export class ClientsApi {
   private sdk: KeycloakAdminSDK;
+  /**
+   * Client certificates API for managing client certificates
+   */
+  public certificates: ClientCertificatesApi;
+
+  /**
+   * Client initial access API for managing client registration tokens
+   */
+  public initialAccess: ClientInitialAccessApi;
+
+  /**
+   * Client registration policy API for managing registration policies
+   */
+  public registrationPolicy: ClientRegistrationPolicyApi;
+
+  /**
+   * API for managing Keycloak client scopes
+   */
+  public clientScopes: ClientScopesApi;
+
+  /**
+   * Client Role Mappings API
+   */
+  public clientRoleMappings: ClientRoleMappingsApi;
 
   /**
    * Creates a new instance of the Clients API
@@ -25,6 +54,13 @@ export class ClientsApi {
    */
   constructor(sdk: KeycloakAdminSDK) {
     this.sdk = sdk;
+
+    // Initialize all sub-APIs
+    this.certificates = new ClientCertificatesApi(sdk);
+    this.initialAccess = new ClientInitialAccessApi(sdk);
+    this.registrationPolicy = new ClientRegistrationPolicyApi(sdk);
+    this.clientScopes = new ClientScopesApi(sdk);
+    this.clientRoleMappings = new ClientRoleMappingsApi(sdk);
   }
 
   /**
