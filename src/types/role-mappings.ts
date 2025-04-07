@@ -1,6 +1,6 @@
 /**
  * Role Mappings types for Keycloak Admin SDK
- * 
+ *
  * These types represent the role mappings objects in Keycloak.
  * Based on: https://www.keycloak.org/docs-api/latest/rest-api/index.html
  */
@@ -15,12 +15,12 @@ export interface ClientMappingsRepresentation {
    * Client ID
    */
   id?: string;
-  
+
   /**
    * Client name
    */
   client?: string;
-  
+
   /**
    * Array of mapped roles
    */
@@ -35,7 +35,7 @@ export interface MappingsRepresentation {
    * Realm role mappings
    */
   realmMappings?: RoleRepresentation[];
-  
+
   /**
    * Client role mappings
    */
