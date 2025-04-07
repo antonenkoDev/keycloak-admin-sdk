@@ -1,5 +1,26 @@
-node_modules
-.idea
+# Development files
+node_modules/
+src/
+tests/
+examples/
+docker/
+scripts/
+
+# Configuration files
+.env*
+.eslintrc*
+.prettier*
+.git*
+.idea/
+.vscode/
+tsconfig.json
+rollup.config.js
+jest.config.cjs
+
+# Build artifacts
 lib/
-.env
+coverage/
 *.log
+
+# Documentation that doesn't need to be published
+CONTRIBUTING.md
