@@ -3,7 +3,7 @@
  * Main entry point for authorization services functionality
  */
 
-import KeycloakAdminSDK from '../../index';
+import KeycloakClient from '../../index';
 import { ResourceServerApi } from './resource-server';
 import { ResourcesApi } from './resources';
 import { ScopesApi } from './scopes';
@@ -24,7 +24,7 @@ import { PermissionsApi } from './permissions';
  * @see https://www.keycloak.org/docs/latest/authorization_services/
  */
 export class AuthorizationServicesApi {
-  private sdk: KeycloakAdminSDK;
+  private sdk: KeycloakClient;
 
   /**
    * Resource Server API for managing resource server configuration
@@ -54,9 +54,9 @@ export class AuthorizationServicesApi {
   /**
    * Creates a new instance of the Authorization Services API
    *
-   * @param {KeycloakAdminSDK} sdk - The Keycloak Admin SDK instance
+   * @param {KeycloakClient} sdk - The Keycloak Admin SDK instance
    */
-  constructor(sdk: KeycloakAdminSDK) {
+  constructor(sdk: KeycloakClient) {
     this.sdk = sdk;
     this.resourceServer = new ResourceServerApi(sdk);
     this.resources = new ResourcesApi(sdk);

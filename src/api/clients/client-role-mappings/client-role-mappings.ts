@@ -6,7 +6,7 @@
  */
 
 import { RoleRepresentation } from '../../../types/roles';
-import KeycloakAdminSDK from '../../../index';
+import KeycloakClient from '../../../index';
 
 /**
  * Client Role Mappings API
@@ -14,14 +14,14 @@ import KeycloakAdminSDK from '../../../index';
  * Provides methods to manage client role mappings for users and groups
  */
 export class ClientRoleMappingsApi {
-  private sdk: KeycloakAdminSDK;
+  private sdk: KeycloakClient;
 
   /**
    * Constructor for ClientRoleMappingsApi
    *
-   * @param sdk - KeycloakAdminSDK instance
+   * @param sdk - KeycloakClient instance
    */
-  constructor(sdk: KeycloakAdminSDK) {
+  constructor(sdk: KeycloakClient) {
     this.sdk = sdk;
   }
 

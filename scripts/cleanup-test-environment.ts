@@ -57,8 +57,8 @@ interface RealmRepresentation {
 async function cleanupTestEnvironment(): Promise<void> {
   try {
     // Dynamically import the built SDK
-    const { default: KeycloakAdminSDK } = await import('../lib/index.js');
-    const sdk = new KeycloakAdminSDK(config);
+    const { default: KeycloakClient } = await import('../lib/index.js');
+    const sdk = new KeycloakClient(config);
 
     const realms = (await sdk.realms.list()) as RealmRepresentation[];
 

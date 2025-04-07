@@ -5,7 +5,7 @@
  * a running Keycloak server, following SOLID principles and clean code practices.
  */
 
-import KeycloakAdminSDK from '../../../src/index';
+import KeycloakClient from '../../../src/index';
 import { IdentityProviderRepresentation } from '../../../src/types/identity-providers';
 import { IdentityProviderMapperRepresentation } from '../../../src/types/identity-provider-mappers';
 import {
@@ -21,7 +21,7 @@ const TEST_TIMEOUT = 30000;
 
 describe('Identity Providers API E2E Tests', () => {
   let testContext: TestContext;
-  let sdk: KeycloakAdminSDK;
+  let sdk: KeycloakClient;
   let testProviderAlias: string;
   let testMapperId: string;
 

@@ -1,27 +1,25 @@
 /**
  * Example: Manage Client Types
- * 
+ *
  * This example demonstrates how to manage client types
  * using the Keycloak Admin SDK.
  */
 
-import KeycloakAdminSDK from "../../src";
-import { config } from "../config";
-import { ClientTypesRepresentation } from "../../src/types/realms";
+import KeycloakClient from '../../src';
+import { config } from '../config';
+import { ClientTypesRepresentation } from '../../src/types/realms'; // Main execution
 
 // Main execution
 (async () => {
   try {
     // Initialize the SDK
-    const sdk = new KeycloakAdminSDK(config);
-    
-    
-    
+    const sdk = new KeycloakClient(config);
+
     // Get client types
     const clientTypes = await sdk.realms.getClientTypes(config.realm);
-    
+
     console.log(JSON.stringify(clientTypes, null, 2));
-    
+
     // Create or update client types
     // Note: Be careful when updating client types as they affect client behavior
     if (clientTypes && clientTypes.realm) {
@@ -43,25 +41,21 @@ import { ClientTypesRepresentation } from "../../src/types/realms";
           }
         ]
       };
-      
-      
+
       await sdk.realms.updateClientTypes(config.realm, updatedClientTypes);
-      
-      
+
       // Get updated client types to verify changes
       const updatedClientTypesResult = await sdk.realms.getClientTypes(config.realm);
-      
+
       console.log(JSON.stringify(updatedClientTypesResult, null, 2));
     } else {
-      
     }
-    
+
     // Get client session stats
-    
+
     const sessionStats = await sdk.realms.getClientSessionStats(config.realm);
-    
+
     console.log(JSON.stringify(sessionStats, null, 2));
-    
   } catch (error) {
     console.error('Error:', error instanceof Error ? error.message : String(error));
   }

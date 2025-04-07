@@ -7,11 +7,11 @@ The Keys API provides methods for retrieving cryptographic keys from Keycloak. T
 You can retrieve all keys metadata from a realm using the `getKeys()` method:
 
 ```typescript
-import KeycloakAdminSDK from 'keycloak-admin-sdk';
+import KeycloakClient from 'keycloak-admin-sdk';
 import { KeysMetadataRepresentation } from 'keycloak-admin-sdk/types/keys';
 
 // Initialize the SDK
-const sdk = new KeycloakAdminSDK({
+const sdk = new KeycloakClient({
   baseUrl: 'https://your-keycloak-instance.com',
   realm: 'your-realm',
   credentials: {

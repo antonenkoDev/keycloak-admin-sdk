@@ -2,7 +2,7 @@
  * E2E tests for the Authorization Resource Server API
  */
 import { afterAll, beforeAll, describe, expect, it } from '@jest/globals';
-import KeycloakAdminSDK from '../../../src';
+import KeycloakClient from '../../../src';
 import {
   cleanupTestEnvironment,
   createTestClient,
@@ -19,7 +19,7 @@ const TEST_TIMEOUT = 30000;
 
 describe('Authorization Resource Server API', () => {
   let testContext: TestContext;
-  let sdk: KeycloakAdminSDK;
+  let sdk: KeycloakClient;
   let clientId: string;
   let realmName: string;
   // Set up test environment before running tests

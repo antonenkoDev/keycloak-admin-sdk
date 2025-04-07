@@ -5,7 +5,7 @@
  * It follows SOLID principles and clean code practices.
  */
 
-import KeycloakAdminSDK from '../../index';
+import KeycloakClient from '../../index';
 import { RoleRepresentation } from '../../types/roles';
 import { ManagementPermissionReference } from '../../types/groups';
 
@@ -27,9 +27,9 @@ export class RolesByIdApi {
   /**
    * Constructor for RolesByIdApi
    *
-   * @param sdk - KeycloakAdminSDK instance
+   * @param sdk - KeycloakClient instance
    */
-  constructor(private sdk: KeycloakAdminSDK) {}
+  constructor(private sdk: KeycloakClient) {}
 
   /**
    * Get a specific role by ID

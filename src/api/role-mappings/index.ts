@@ -5,7 +5,7 @@
  * It follows SOLID principles and clean code practices.
  */
 
-import KeycloakAdminSDK from '../../index';
+import KeycloakClient from '../../index';
 import { UserRoleMappingsApi } from './user-role-mappings';
 import { GroupRoleMappingsApi } from './group-role-mappings';
 import { GroupClientRoleMappingsApi, UserClientRoleMappingsApi } from './client-role-mappings';
@@ -21,14 +21,14 @@ export { UserClientRoleMappingsApi, GroupClientRoleMappingsApi } from './client-
  * Factory class for creating role mappings API instances for different resource types
  */
 export class RoleMappingsApiFactory {
-  private sdk: KeycloakAdminSDK;
+  private sdk: KeycloakClient;
 
   /**
    * Constructor for RoleMappingsApiFactory
    *
-   * @param sdk - KeycloakAdminSDK instance
+   * @param sdk - KeycloakClient instance
    */
-  constructor(sdk: KeycloakAdminSDK) {
+  constructor(sdk: KeycloakClient) {
     this.sdk = sdk;
   }
 

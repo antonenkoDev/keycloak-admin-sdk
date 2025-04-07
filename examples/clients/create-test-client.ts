@@ -12,7 +12,7 @@
  * - Proper resource cleanup in finally blocks
  */
 
-import KeycloakAdminSDK from '../../src';
+import KeycloakClient from '../../src';
 import { ClientRepresentation } from '../../src/types/clients';
 import { RealmRepresentation } from '../../src/types/realms';
 import { KeycloakConfig } from '../../src/types/auth';
@@ -43,11 +43,11 @@ function generateUniqueClientId(): string {
 
 /**
  * Create a test realm for end-to-end testing
- * @param sdk - Initialized KeycloakAdminSDK instance
+ * @param sdk - Initialized KeycloakClient instance
  * @param realmName - Name of the realm to create
  * @returns Promise resolving to the created realm name
  */
-async function createTestRealm(sdk: KeycloakAdminSDK, realmName: string): Promise<string> {
+async function createTestRealm(sdk: KeycloakClient, realmName: string): Promise<string> {
   console.log(`Creating test realm: ${realmName}`);
 
   try {
@@ -89,13 +89,13 @@ async function createTestRealm(sdk: KeycloakAdminSDK, realmName: string): Promis
 
 /**
  * Create a test client in the specified realm
- * @param sdk - Initialized KeycloakAdminSDK instance
+ * @param sdk - Initialized KeycloakClient instance
  * @param realmName - Name of the realm to create the client in
  * @param clientId - Client ID for the new client
  * @returns Promise resolving to the created client's internal ID
  */
 async function createTestClient(
-  sdk: KeycloakAdminSDK,
+  sdk: KeycloakClient,
   realmName: string,
   clientId: string
 ): Promise<string> {
@@ -103,7 +103,7 @@ async function createTestClient(
 
   try {
     // Create a new SDK instance configured for the target realm
-    const realmSdk = new KeycloakAdminSDK({
+    const realmSdk = new KeycloakClient({
       ...config,
       realm: realmName
     });
@@ -153,13 +153,13 @@ async function createTestClient(
 
 /**
  * Get and display the client secret
- * @param sdk - Initialized KeycloakAdminSDK instance
+ * @param sdk - Initialized KeycloakClient instance
  * @param realmName - Name of the realm containing the client
  * @param clientId - Internal ID of the client
  * @returns Promise resolving to the client secret
  */
 async function getAndDisplayClientSecret(
-  sdk: KeycloakAdminSDK,
+  sdk: KeycloakClient,
   realmName: string,
   clientId: string
 ): Promise<string> {
@@ -168,7 +168,7 @@ async function getAndDisplayClientSecret(
   try {
     // Get the client secret
     // Create a new SDK instance configured for the target realm
-    const realmSdk = new KeycloakAdminSDK({
+    const realmSdk = new KeycloakClient({
       ...config,
       realm: realmName
     });
@@ -203,7 +203,7 @@ async function createTestRealmAndClient() {
 
   try {
     // Initialize the SDK
-    const sdk = new KeycloakAdminSDK(config);
+    const sdk = new KeycloakClient(config);
     console.log(`Connected to Keycloak at ${config.baseUrl}`);
 
     // Create test realm
@@ -239,7 +239,7 @@ async function createTestRealmAndClient() {
     if (createdClientInternalId) {
       console.log('\nAttempting to clean up partially created resources...');
       try {
-        const sdk = new KeycloakAdminSDK(config);
+        const sdk = new KeycloakClient(config);
         await sdk.realms.delete(realmName);
         console.log(`Successfully cleaned up realm: ${realmName}`);
       } catch (cleanupError) {

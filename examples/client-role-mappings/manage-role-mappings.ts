@@ -8,7 +8,7 @@
  * - Removing client roles from users and groups
  */
 
-import KeycloakAdminSDK from '../../src/index';
+import KeycloakClient from '../../src/index';
 import { RoleRepresentation } from '../../src/types/roles';
 import { KeycloakConfig } from '../../src/types/auth';
 import dotenv from 'dotenv';
@@ -28,7 +28,7 @@ const config: KeycloakConfig = {
   }
 };
 
-const sdk = new KeycloakAdminSDK(config);
+const sdk = new KeycloakClient(config);
 
 /**
  * Manage client role mappings for users and groups

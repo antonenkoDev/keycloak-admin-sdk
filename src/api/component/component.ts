@@ -1,21 +1,21 @@
 /**
  * Component API for Keycloak Admin SDK
  */
-import KeycloakAdminSDK from '../../index';
+import KeycloakClient from '../../index';
 import { ComponentRepresentation, ComponentTypeRepresentation } from '../../types/component';
 
 /**
  * Component API class for managing Keycloak components
  */
 export class ComponentApi {
-  private sdk: KeycloakAdminSDK;
+  private sdk: KeycloakClient;
 
   /**
    * Constructor for ComponentApi
    *
-   * @param sdk - KeycloakAdminSDK instance
+   * @param sdk - KeycloakClient instance
    */
-  constructor(sdk: KeycloakAdminSDK) {
+  constructor(sdk: KeycloakClient) {
     this.sdk = sdk;
   }
 

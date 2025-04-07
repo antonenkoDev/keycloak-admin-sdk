@@ -5,7 +5,7 @@
  * using the Keycloak Admin SDK.
  */
 
-import KeycloakAdminSDK from '../../src/index';
+import KeycloakClient from '../../src/index';
 import { ClientScopeRepresentation, ProtocolMapperRepresentation } from '../../src/types/clients';
 import { KeycloakConfig } from '../../src/types/auth';
 import dotenv from 'dotenv';
@@ -25,7 +25,7 @@ const config: KeycloakConfig = {
   }
 };
 
-const sdk = new KeycloakAdminSDK(config);
+const sdk = new KeycloakClient(config);
 
 /**
  * Create a new client scope with protocol mappers

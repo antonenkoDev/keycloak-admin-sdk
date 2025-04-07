@@ -1,4 +1,4 @@
-import KeycloakAdminSDK from '../../index';
+import KeycloakClient from '../../index';
 import { UserRepresentation } from '../../types/users';
 import {
   GetGroupChildrenParams,
@@ -14,7 +14,7 @@ import {
  * API for managing Keycloak groups
  */
 export class GroupsApi {
-  constructor(private sdk: KeycloakAdminSDK) {}
+  constructor(private sdk: KeycloakClient) {}
 
   /**
    * Get group hierarchy. Only name and id are returned.

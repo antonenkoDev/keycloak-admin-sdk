@@ -18,7 +18,7 @@
  * Following SOLID principles and clean code practices.
  */
 
-import KeycloakAdminSDK from '../../src';
+import KeycloakClient from '../../src';
 import { KeycloakConfig } from '../../src/types/auth';
 import { ClientRepresentation } from '../../src/types/clients';
 import { RoleRepresentation } from '../../src/types/roles';
@@ -41,7 +41,7 @@ const config: KeycloakConfig = {
 };
 
 // Create the Keycloak Admin SDK instance
-const sdk = new KeycloakAdminSDK(config);
+const sdk = new KeycloakClient(config);
 
 async function main() {
   // Define variables outside try block to ensure they're available in finally block for cleanup

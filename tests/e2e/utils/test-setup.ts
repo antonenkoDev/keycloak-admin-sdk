@@ -4,7 +4,7 @@
  * Provides helper functions for setting up and tearing down the test environment
  */
 
-import KeycloakAdminSDK from '../../../src';
+import KeycloakClient from '../../../src';
 import { RealmRepresentation } from '../../../src/types/realms';
 import { ClientRepresentation as ClientRep } from '../../../src/types/clients';
 import { KeycloakConfig } from '../../../src/types/auth';
@@ -45,7 +45,7 @@ export function generateUniqueName(prefix: string): string {
  * Test environment context
  */
 export interface TestContext {
-  sdk: KeycloakAdminSDK;
+  sdk: KeycloakClient;
   realmName: string;
   clientId?: string;
   clientId2?: string; // Additional client ID for testing
@@ -62,7 +62,7 @@ export interface TestContext {
  */
 export async function setupTestEnvironment(): Promise<TestContext> {
   // Create initial SDK instance for admin operations
-  const adminSdk = new KeycloakAdminSDK(config);
+  const adminSdk = new KeycloakClient(config);
   const realmName = generateUniqueName('test-realm');
 
   // Create a test realm with email configuration and authorization enabled
@@ -227,7 +227,7 @@ export async function setupTestEnvironment(): Promise<TestContext> {
       }
     };
 
-    const sdk = new KeycloakAdminSDK(testRealmConfig);
+    const sdk = new KeycloakClient(testRealmConfig);
 
     // Return context with the SDK and realm name
     return {
@@ -382,10 +382,10 @@ export async function createTestClient(context: TestContext): Promise<TestContex
 /**
  * Create a test user in the specified realm
  *
- * @param sdk - KeycloakAdminSDK instance
+ * @param sdk - KeycloakClient instance
  * @returns Created user representation
  */
-export async function createTestUser(sdk: KeycloakAdminSDK) {
+export async function createTestUser(sdk: KeycloakClient) {
   try {
     // Generate a unique username
     const username = generateUniqueName('test-user');
@@ -410,10 +410,10 @@ export async function createTestUser(sdk: KeycloakAdminSDK) {
 /**
  * Create a test group in the specified realm
  *
- * @param sdk - KeycloakAdminSDK instance
+ * @param sdk - KeycloakClient instance
  * @returns Created group representation
  */
-export async function createTestGroup(sdk: KeycloakAdminSDK) {
+export async function createTestGroup(sdk: KeycloakClient) {
   try {
     // Generate a unique group name
     const groupName = generateUniqueName('test-group');
@@ -482,7 +482,7 @@ export async function cleanupTestEnvironment(context: TestContext): Promise<void
 
     // Create an admin SDK instance to delete the realm
     // Important: Use the master realm for admin operations
-    const adminSdk = new KeycloakAdminSDK({
+    const adminSdk = new KeycloakClient({
       ...config,
       realm: 'master' // Always use master realm for administrative operations
     });

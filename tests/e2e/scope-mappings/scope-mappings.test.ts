@@ -5,13 +5,13 @@
  * It follows SOLID principles and clean code practices.
  */
 
-import KeycloakAdminSDK from '../../../src';
+import KeycloakClient from '../../../src';
 import { RoleRepresentation } from '../../../src/types/roles';
 import { ClientRepresentation } from '../../../src/types/clients';
 import { cleanupTestEnvironment, setupTestEnvironment } from '../utils/test-setup'; // Test variables
 
 // Test variables
-let sdk: KeycloakAdminSDK;
+let sdk: KeycloakClient;
 let testRealmName: string;
 let clientId: string;
 let targetClientId: string;

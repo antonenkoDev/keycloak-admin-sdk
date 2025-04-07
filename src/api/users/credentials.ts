@@ -1,8 +1,8 @@
-import KeycloakAdminSDK from '../../index';
+import KeycloakClient from '../../index';
 import { CredentialRepresentation } from '../../types/users';
 
 export class CredentialsApi {
-  constructor(private sdk: KeycloakAdminSDK) {}
+  constructor(private sdk: KeycloakClient) {}
 
   /**
    * Get credentials for a user.

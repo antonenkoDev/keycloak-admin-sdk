@@ -3,21 +3,21 @@
  * Provides methods for managing client certificates in Keycloak
  */
 
-import KeycloakAdminSDK from '../../../index';
+import KeycloakClient from '../../../index';
 import { CertificateRepresentation, KeyStoreConfig } from '../../../types/certificates';
 
 /**
  * API for managing Keycloak client certificates
  */
 export class ClientCertificatesApi {
-  private sdk: KeycloakAdminSDK;
+  private sdk: KeycloakClient;
 
   /**
    * Creates a new instance of the Client Certificates API
    *
-   * @param {KeycloakAdminSDK} sdk - The Keycloak Admin SDK instance
+   * @param {KeycloakClient} sdk - The Keycloak Admin SDK instance
    */
-  constructor(sdk: KeycloakAdminSDK) {
+  constructor(sdk: KeycloakClient) {
     this.sdk = sdk;
   }
 

@@ -1,6 +1,6 @@
 /**
  * Example: Manage Organizations
- * 
+ *
  * This example demonstrates how to manage organizations in Keycloak:
  * - Creating organizations
  * - Listing organizations
@@ -9,11 +9,11 @@
  * - Managing member roles
  * - Handling errors properly
  * - Using ID extraction from Location headers
- * 
+ *
  * Following SOLID principles and clean code practices.
  */
 
-import KeycloakAdminSDK from '../../src/index';
+import KeycloakClient from '../../src/index';
 import { KeycloakConfig } from '../../src/types/auth';
 import { OrganizationRepresentation } from '../../src/types/organizations';
 import { UserRepresentation } from '../../src/types/users';
@@ -34,11 +34,11 @@ const config: KeycloakConfig = {
   }
 };
 
-const sdk = new KeycloakAdminSDK(config);
+const sdk = new KeycloakClient(config);
 
 /**
  * Manage organizations
- * 
+ *
  * Following SOLID principles:
  * - Single Responsibility: Each function has a clear purpose
  * - Open/Closed: Functionality is extended without modifying existing code
@@ -53,7 +53,7 @@ async function manageOrganizations() {
 
   try {
     console.log('Starting Organizations API example...');
-    
+
     // Step 1: Create a test organization
     console.log('\nStep 1: Creating test organization');
 
@@ -74,7 +74,9 @@ async function manageOrganizations() {
       console.log(`Organization created with ID: ${orgId} (extracted from Location header)`);
     } catch (error) {
       // Check if this is because Organizations API is not supported in this Keycloak version
-      console.error('Failed to create organization. This may be because the Organizations API is not supported in your Keycloak version.');
+      console.error(
+        'Failed to create organization. This may be because the Organizations API is not supported in your Keycloak version.'
+      );
       throw error;
     }
 
@@ -112,7 +114,9 @@ async function manageOrganizations() {
     const members = await sdk.organizations.getMembers(orgId);
     console.log(`Organization ${orgName} has ${members.length} members:`);
     members.forEach(member => {
-      console.log(`- ${member.username} (${member.id}): Roles: ${member.roles?.join(', ') || 'none'}`);
+      console.log(
+        `- ${member.username} (${member.id}): Roles: ${member.roles?.join(', ') || 'none'}`
+      );
     });
 
     // Step 6: Check member details
@@ -122,7 +126,7 @@ async function manageOrganizations() {
       // Get member details again to verify membership
       const updatedMembers = await sdk.organizations.getMembers(orgId);
       const member = updatedMembers.find(m => m.id === userId);
-      
+
       if (member) {
         console.log(`Member details for ${member.username}:`);
         console.log(`- ID: ${member.id}`);
@@ -150,7 +154,9 @@ async function manageOrganizations() {
     try {
       const searchQuery = { search: orgName.substring(0, 8) };
       const searchResults = await sdk.organizations.list(searchQuery);
-      console.log(`Search found ${searchResults.length} organizations matching '${searchQuery.search}'`);
+      console.log(
+        `Search found ${searchResults.length} organizations matching '${searchQuery.search}'`
+      );
       searchResults.forEach(org => {
         console.log(`- ${org.name} (${org.id})`);
       });
@@ -159,7 +165,6 @@ async function manageOrganizations() {
     }
 
     console.log('\nOrganizations API example completed successfully!');
-
   } catch (error) {
     console.error('Error managing organizations:', error);
     if (error instanceof Error) {
@@ -178,7 +183,9 @@ async function manageOrganizations() {
           await sdk.organizations.removeMember(orgId, userId);
           console.log(`Removed user from organization ${orgId}`);
         } catch (error) {
-          console.warn(`Failed to remove user from organization: ${error instanceof Error ? error.message : error}`);
+          console.warn(
+            `Failed to remove user from organization: ${error instanceof Error ? error.message : error}`
+          );
         }
 
         // Delete test user
@@ -186,7 +193,9 @@ async function manageOrganizations() {
           await sdk.users.delete(userId);
           console.log(`Deleted test user ${userId}`);
         } catch (error) {
-          console.warn(`Failed to delete test user: ${error instanceof Error ? error.message : error}`);
+          console.warn(
+            `Failed to delete test user: ${error instanceof Error ? error.message : error}`
+          );
         }
 
         // Delete test organization
@@ -194,10 +203,12 @@ async function manageOrganizations() {
           await sdk.organizations.delete(orgId);
           console.log(`Deleted test organization ${orgId}`);
         } catch (error) {
-          console.warn(`Failed to delete test organization: ${error instanceof Error ? error.message : error}`);
+          console.warn(
+            `Failed to delete test organization: ${error instanceof Error ? error.message : error}`
+          );
         }
       }
-      
+
       console.log('Cleanup completed');
     } catch (error) {
       console.error('Error during cleanup:', error);

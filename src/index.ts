@@ -23,7 +23,7 @@ import { HttpMethod, makeRequest } from './utils/request';
 /**
  * Main SDK class for interacting with the Keycloak Admin REST API
  */
-class KeycloakAdminSDK {
+class KeycloakClient {
   private baseUrl: string;
   private adminUrl: string;
   private config: KeycloakConfig;
@@ -192,4 +192,4 @@ class KeycloakAdminSDK {
   }
 }
 
-export default KeycloakAdminSDK;
+export default KeycloakClient;

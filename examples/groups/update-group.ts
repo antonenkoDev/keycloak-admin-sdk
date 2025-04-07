@@ -7,7 +7,7 @@
 
 // Configuration for Keycloak SDK
 import { KeycloakConfig } from '../../src/types/auth';
-import KeycloakAdminSDK from '../../src';
+import KeycloakClient from '../../src';
 import { GroupRepresentation } from '../../src/types/groups';
 
 const config: KeycloakConfig = {
@@ -21,7 +21,7 @@ const config: KeycloakConfig = {
 };
 
 // Instantiate Keycloak SDK
-const sdk = new KeycloakAdminSDK(config);
+const sdk = new KeycloakClient(config);
 
 /**
  * Find a group by name

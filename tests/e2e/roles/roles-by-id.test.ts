@@ -5,13 +5,13 @@
  * It follows SOLID principles and clean code practices.
  */
 
-import KeycloakAdminSDK from '../../../src';
+import KeycloakClient from '../../../src';
 import { RoleRepresentation } from '../../../src/types/roles';
 import { cleanupTestEnvironment, setupTestEnvironment, TestContext } from '../utils/test-setup';
 
 describe('Roles by ID API E2E Tests', () => {
   let testContext: TestContext;
-  let sdk: KeycloakAdminSDK;
+  let sdk: KeycloakClient;
   let testRoleId: string;
   let compositeRoleId: string;
 

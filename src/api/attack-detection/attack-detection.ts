@@ -3,7 +3,7 @@
  * Provides methods for managing brute force detection for users
  */
 
-import KeycloakAdminSDK from '../../index';
+import KeycloakClient from '../../index';
 
 /**
  * Represents the status of a user in brute force detection
@@ -37,9 +37,9 @@ export class AttackDetectionApi {
   /**
    * Creates a new instance of the Attack Detection API
    *
-   * @param {KeycloakAdminSDK} sdk - The Keycloak Admin SDK instance
+   * @param {KeycloakClient} sdk - The Keycloak Admin SDK instance
    */
-  constructor(private sdk: KeycloakAdminSDK) {}
+  constructor(private sdk: KeycloakClient) {}
 
   /**
    * Clear any user login failures for all users

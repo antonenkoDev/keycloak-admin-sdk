@@ -6,7 +6,7 @@
  * Based on: https://www.keycloak.org/docs-api/latest/rest-api/index.html#_roles
  */
 
-import KeycloakAdminSDK from '../../index';
+import KeycloakClient from '../../index';
 import { RoleQuery, RoleRepresentation } from '../../types/roles';
 import { GroupRepresentation, ManagementPermissionReference } from '../../types/groups';
 import { UserRepresentation } from '../../types/users';
@@ -18,7 +18,7 @@ import { RolesByIdApi } from './roles-by-id';
  * Provides methods to manage realm and client roles in Keycloak
  */
 export class RolesApi {
-  private sdk: KeycloakAdminSDK;
+  private sdk: KeycloakClient;
   /**
    * Roles by ID API for direct ID-based operations
    */
@@ -27,9 +27,9 @@ export class RolesApi {
   /**
    * Constructor for RolesApi
    *
-   * @param sdk - KeycloakAdminSDK instance
+   * @param sdk - KeycloakClient instance
    */
-  constructor(sdk: KeycloakAdminSDK) {
+  constructor(sdk: KeycloakClient) {
     this.sdk = sdk;
     this.byId = new RolesByIdApi(sdk);
   }

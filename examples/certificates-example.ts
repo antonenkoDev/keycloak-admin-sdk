@@ -9,7 +9,7 @@
  * 5. Manage client initial access tokens
  */
 
-import KeycloakAdminSDK from '../src';
+import KeycloakClient from '../src';
 import { KeyStoreConfig } from '../src/types/certificates';
 import { loadConfig } from './config';
 import fs from 'fs';
@@ -21,7 +21,7 @@ async function certificatesExample() {
     const config = loadConfig();
 
     // Initialize the SDK
-    const sdk = new KeycloakAdminSDK(config);
+    const sdk = new KeycloakClient(config);
 
     console.log('Starting certificate management example...');
 

@@ -5,7 +5,7 @@
  * in a Keycloak client with authorization services enabled.
  */
 
-import KeycloakAdminSDK from '../src';
+import KeycloakClient from '../src';
 import {
   PolicyRepresentation,
   ResourceRepresentation,
@@ -17,8 +17,8 @@ import {
  * Create a Keycloak Admin SDK instance with configuration from environment variables
  * @returns Configured SDK instance
  */
-function createSdk(): KeycloakAdminSDK {
-  return new KeycloakAdminSDK({
+function createSdk(): KeycloakClient {
+  return new KeycloakClient({
     baseUrl: process.env.KEYCLOAK_URL || 'http://localhost:8080',
     realm: process.env.KEYCLOAK_REALM || 'master',
     authMethod: 'password',
@@ -35,7 +35,7 @@ function createSdk(): KeycloakAdminSDK {
  * @param sdk Keycloak Admin SDK instance
  * @returns Client ID
  */
-async function getOrCreateAuthzClient(sdk: KeycloakAdminSDK): Promise<string> {
+async function getOrCreateAuthzClient(sdk: KeycloakClient): Promise<string> {
   const clientId = 'authz-test-client';
 
   // Check if client exists
@@ -78,7 +78,7 @@ async function getOrCreateAuthzClient(sdk: KeycloakAdminSDK): Promise<string> {
  * @returns Resource server configuration
  */
 async function getResourceServer(
-  sdk: KeycloakAdminSDK,
+  sdk: KeycloakClient,
   clientUuid: string
 ): Promise<ResourceServerRepresentation> {
   try {
@@ -98,7 +98,7 @@ async function getResourceServer(
  * @returns Created resource
  */
 async function createResource(
-  sdk: KeycloakAdminSDK,
+  sdk: KeycloakClient,
   clientUuid: string,
   resourceName: string
 ): Promise<ResourceRepresentation> {
@@ -131,7 +131,7 @@ async function createResource(
  * @returns Created scope
  */
 async function createScope(
-  sdk: KeycloakAdminSDK,
+  sdk: KeycloakClient,
   clientUuid: string,
   scopeName: string
 ): Promise<ScopeRepresentation> {
@@ -157,7 +157,7 @@ async function createScope(
  * @returns Created policy
  */
 async function createJsPolicy(
-  sdk: KeycloakAdminSDK,
+  sdk: KeycloakClient,
   clientUuid: string,
   policyName: string
 ): Promise<PolicyRepresentation> {

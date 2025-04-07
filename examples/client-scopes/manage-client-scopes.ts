@@ -8,7 +8,7 @@
  * - Assigning client scopes to clients as default or optional
  */
 
-import KeycloakAdminSDK from '../../src/index';
+import KeycloakClient from '../../src/index';
 import { ClientScopeRepresentation, ProtocolMapperRepresentation } from '../../src/types/clients';
 import { KeycloakConfig } from '../../src/types/auth';
 import dotenv from 'dotenv';
@@ -28,7 +28,7 @@ const config: KeycloakConfig = {
   }
 };
 
-const sdk = new KeycloakAdminSDK(config);
+const sdk = new KeycloakClient(config);
 
 /**
  * Manage client scopes and assign to clients

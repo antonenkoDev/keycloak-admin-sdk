@@ -3,7 +3,7 @@
  * Focused on managing authorization permissions
  */
 
-import KeycloakAdminSDK from '../../index';
+import KeycloakClient from '../../index';
 import {
   AbstractPolicyRepresentation,
   PolicyEvaluationRequest,
@@ -21,14 +21,14 @@ import {
  * @see https://www.keycloak.org/docs/latest/authorization_services/#_permission
  */
 export class PermissionsApi {
-  private sdk: KeycloakAdminSDK;
+  private sdk: KeycloakClient;
 
   /**
    * Creates a new instance of the Permissions API
    *
-   * @param {KeycloakAdminSDK} sdk - The Keycloak Admin SDK instance
+   * @param {KeycloakClient} sdk - The Keycloak Admin SDK instance
    */
-  constructor(sdk: KeycloakAdminSDK) {
+  constructor(sdk: KeycloakClient) {
     this.sdk = sdk;
   }
 

@@ -3,7 +3,7 @@
  * Provides methods for managing client initial access tokens in Keycloak
  */
 
-import KeycloakAdminSDK from '../../../index';
+import KeycloakClient from '../../../index';
 import {
   ClientInitialAccessCreatePresentation,
   ClientInitialAccessPresentation
@@ -13,14 +13,14 @@ import {
  * API for managing Keycloak client initial access tokens
  */
 export class ClientInitialAccessApi {
-  private sdk: KeycloakAdminSDK;
+  private sdk: KeycloakClient;
 
   /**
    * Creates a new instance of the Client Initial Access API
    *
-   * @param {KeycloakAdminSDK} sdk - The Keycloak Admin SDK instance
+   * @param {KeycloakClient} sdk - The Keycloak Admin SDK instance
    */
-  constructor(sdk: KeycloakAdminSDK) {
+  constructor(sdk: KeycloakClient) {
     this.sdk = sdk;
   }
 

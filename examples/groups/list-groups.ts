@@ -12,7 +12,7 @@
  */
 
 import { KeycloakConfig } from '../../src/types/auth';
-import KeycloakAdminSDK from '../../src';
+import KeycloakClient from '../../src';
 import { GroupRepresentation } from '../../src/types/groups';
 import { UserRepresentation } from '../../src/types/users';
 import dotenv from 'dotenv'; // Load environment variables from .env file
@@ -34,10 +34,10 @@ const config: KeycloakConfig = {
 
 /**
  * List all groups in the realm
- * @param sdk - Initialized KeycloakAdminSDK instance
+ * @param sdk - Initialized KeycloakClient instance
  * @returns Promise resolving to an array of groups
  */
-async function listAllGroups(sdk: KeycloakAdminSDK): Promise<GroupRepresentation[]> {
+async function listAllGroups(sdk: KeycloakClient): Promise<GroupRepresentation[]> {
   console.log('Retrieving all groups in the realm...');
 
   try {
@@ -62,14 +62,11 @@ async function listAllGroups(sdk: KeycloakAdminSDK): Promise<GroupRepresentation
 
 /**
  * Get detailed information about a specific group
- * @param sdk - Initialized KeycloakAdminSDK instance
+ * @param sdk - Initialized KeycloakClient instance
  * @param groupId - ID of the group to get details for
  * @returns Promise resolving to the group details
  */
-async function getGroupDetails(
-  sdk: KeycloakAdminSDK,
-  groupId: string
-): Promise<GroupRepresentation> {
+async function getGroupDetails(sdk: KeycloakClient, groupId: string): Promise<GroupRepresentation> {
   console.log(`Retrieving details for group with ID: ${groupId}`);
 
   try {
@@ -94,12 +91,12 @@ async function getGroupDetails(
 
 /**
  * Get members of a specific group
- * @param sdk - Initialized KeycloakAdminSDK instance
+ * @param sdk - Initialized KeycloakClient instance
  * @param groupId - ID of the group to get members for
  * @returns Promise resolving to an array of group members
  */
 async function getGroupMembers(
-  sdk: KeycloakAdminSDK,
+  sdk: KeycloakClient,
   groupId: string
 ): Promise<UserRepresentation[]> {
   console.log(`Retrieving members for group with ID: ${groupId}`);
@@ -122,14 +119,11 @@ async function getGroupMembers(
 
 /**
  * Get subgroups of a specific group
- * @param sdk - Initialized KeycloakAdminSDK instance
+ * @param sdk - Initialized KeycloakClient instance
  * @param groupId - ID of the parent group
  * @returns Promise resolving to an array of subgroups
  */
-async function getSubgroups(
-  sdk: KeycloakAdminSDK,
-  groupId: string
-): Promise<GroupRepresentation[]> {
+async function getSubgroups(sdk: KeycloakClient, groupId: string): Promise<GroupRepresentation[]> {
   console.log(`Retrieving subgroups for group with ID: ${groupId}`);
 
   try {
@@ -193,7 +187,7 @@ async function demonstrateGroupListing(): Promise<void> {
 
   try {
     // Initialize the Keycloak Admin SDK
-    const sdk = new KeycloakAdminSDK(config);
+    const sdk = new KeycloakClient(config);
     console.log(`Connected to Keycloak at ${config.baseUrl}`);
 
     // List all groups in the realm

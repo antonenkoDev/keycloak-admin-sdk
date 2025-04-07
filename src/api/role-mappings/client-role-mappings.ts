@@ -3,23 +3,23 @@
  * Provides methods for managing client-level role mappings for users and groups
  */
 
-import KeycloakAdminSDK from '../../index';
+import KeycloakClient from '../../index';
 import { RoleRepresentation } from '../../types/roles';
 
 /**
  * Base class for client role mappings operations
  */
 export abstract class BaseClientRoleMappingsApi {
-  protected sdk: KeycloakAdminSDK;
+  protected sdk: KeycloakClient;
 
   protected abstract getBasePath(id: string): string;
 
   /**
    * Creates a new instance of the Base Client Role Mappings API
    *
-   * @param {KeycloakAdminSDK} sdk - The Keycloak Admin SDK instance
+   * @param {KeycloakClient} sdk - The Keycloak Admin SDK instance
    */
-  constructor(sdk: KeycloakAdminSDK) {
+  constructor(sdk: KeycloakClient) {
     this.sdk = sdk;
   }
 

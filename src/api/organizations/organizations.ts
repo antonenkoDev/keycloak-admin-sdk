@@ -6,7 +6,7 @@
  * Based on: https://www.keycloak.org/docs-api/latest/rest-api/index.html#_organizations
  */
 
-import KeycloakAdminSDK from '../../index';
+import KeycloakClient from '../../index';
 import {
   OrganizationMemberRepresentation,
   OrganizationQuery,
@@ -20,14 +20,14 @@ import { IdentityProviderRepresentation } from '../../types/identity-providers';
  * Provides methods to manage organizations in Keycloak
  */
 export class OrganizationsApi {
-  private sdk: KeycloakAdminSDK;
+  private sdk: KeycloakClient;
 
   /**
    * Constructor for OrganizationsApi
    *
-   * @param sdk - KeycloakAdminSDK instance
+   * @param sdk - KeycloakClient instance
    */
-  constructor(sdk: KeycloakAdminSDK) {
+  constructor(sdk: KeycloakClient) {
     this.sdk = sdk;
   }
 

@@ -3,21 +3,21 @@
  * Provides methods for managing client registration policies in Keycloak
  */
 
-import KeycloakAdminSDK from '../../../index';
+import KeycloakClient from '../../../index';
 import { ComponentTypeRepresentation } from '../../../types/certificates';
 
 /**
  * API for managing Keycloak client registration policies
  */
 export class ClientRegistrationPolicyApi {
-  private sdk: KeycloakAdminSDK;
+  private sdk: KeycloakClient;
 
   /**
    * Creates a new instance of the Client Registration Policy API
    *
-   * @param {KeycloakAdminSDK} sdk - The Keycloak Admin SDK instance
+   * @param {KeycloakClient} sdk - The Keycloak Admin SDK instance
    */
-  constructor(sdk: KeycloakAdminSDK) {
+  constructor(sdk: KeycloakClient) {
     this.sdk = sdk;
   }
 

@@ -1,17 +1,17 @@
 /**
  * Enhanced Error Handling Example
- * 
+ *
  * This example demonstrates the improved error handling and debugging capabilities
  * in the Keycloak Admin SDK, including:
  * - Detailed error messages with context information
  * - Proper error propagation
  * - ID extraction from Location headers
  * - Comprehensive logging
- * 
+ *
  * Following SOLID principles and clean code practices.
  */
 
-import KeycloakAdminSDK from '../../src';
+import KeycloakClient from '../../src';
 import { KeycloakConfig } from '../../src/types/auth';
 import { UserRepresentation } from '../../src/types/users';
 import { ClientRepresentation } from '../../src/types/clients';
@@ -32,7 +32,7 @@ const config: KeycloakConfig = {
   }
 };
 
-const sdk = new KeycloakAdminSDK(config);
+const sdk = new KeycloakClient(config);
 
 /**
  * Demonstrate enhanced error handling and ID extraction
@@ -43,7 +43,7 @@ async function demonstrateEnhancedFeatures() {
 
     // 1. Demonstrate ID extraction from Location headers
     console.log('1. ID Extraction from Location Headers:');
-    
+
     // Create a user and get the ID directly from the Location header
     const username = `test-user-${Date.now()}`;
     const newUser: UserRepresentation = {
@@ -70,11 +70,13 @@ async function demonstrateEnhancedFeatures() {
 
     console.log(`\nCreating client: ${clientId}`);
     const createdClientId = await sdk.clients.create(newClient);
-    console.log(`Client created with ID: ${createdClientId} (extracted directly from Location header)`);
+    console.log(
+      `Client created with ID: ${createdClientId} (extracted directly from Location header)`
+    );
 
     // 2. Demonstrate error handling with intentional errors
     console.log('\n2. Enhanced Error Handling:');
-    
+
     try {
       // Try to get a non-existent user
       console.log('Attempting to get a non-existent user...');
@@ -101,15 +103,14 @@ async function demonstrateEnhancedFeatures() {
 
     // 3. Clean up test resources
     console.log('\n3. Cleaning up test resources:');
-    
+
     console.log(`Deleting user: ${userId}`);
     await sdk.users.delete(userId);
-    
+
     console.log(`Deleting client: ${createdClientId}`);
     await sdk.clients.delete(createdClientId);
-    
-    console.log('\nCleanup completed successfully.');
 
+    console.log('\nCleanup completed successfully.');
   } catch (error) {
     console.error('Error in enhanced features demonstration:', error);
     if (error instanceof Error) {

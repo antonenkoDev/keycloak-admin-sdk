@@ -23,10 +23,10 @@ npm install keycloak-admin-sdk
 ## Usage
 
 ```typescript
-import KeycloakAdminSDK from 'keycloak-admin-sdk';
+import KeycloakClient from 'keycloak-admin-sdk';
 
 // Initialize the SDK
-const sdk = new KeycloakAdminSDK({
+const sdk = new KeycloakClient({
   baseUrl: 'http://localhost:8080',
   realm: 'master',
   authMethod: 'password',

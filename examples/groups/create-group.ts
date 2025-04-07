@@ -14,7 +14,7 @@
  */
 
 import { KeycloakConfig } from '../../src/types/auth';
-import KeycloakAdminSDK from '../../src';
+import KeycloakClient from '../../src';
 import { GroupRepresentation } from '../../src/types/groups';
 import dotenv from 'dotenv'; // Load environment variables from .env file
 
@@ -35,11 +35,11 @@ const config: KeycloakConfig = {
 
 /**
  * Create a top-level group in Keycloak
- * @param sdk - Initialized KeycloakAdminSDK instance
+ * @param sdk - Initialized KeycloakClient instance
  * @param groupName - Name of the group to create
  * @returns Promise resolving to the ID of the created group
  */
-async function createTopLevelGroup(sdk: KeycloakAdminSDK, groupName: string): Promise<string> {
+async function createTopLevelGroup(sdk: KeycloakClient, groupName: string): Promise<string> {
   console.log(`Creating top-level group: ${groupName}`);
 
   try {
@@ -75,13 +75,13 @@ async function createTopLevelGroup(sdk: KeycloakAdminSDK, groupName: string): Pr
 
 /**
  * Create a subgroup under a parent group
- * @param sdk - Initialized KeycloakAdminSDK instance
+ * @param sdk - Initialized KeycloakClient instance
  * @param parentId - ID of the parent group
  * @param subgroupName - Name of the subgroup to create
  * @returns Promise resolving to the ID of the created subgroup
  */
 async function createSubgroup(
-  sdk: KeycloakAdminSDK,
+  sdk: KeycloakClient,
   parentId: string,
   subgroupName: string
 ): Promise<string> {
@@ -134,10 +134,10 @@ async function createSubgroup(
 
 /**
  * Display group structure with subgroups
- * @param sdk - Initialized KeycloakAdminSDK instance
+ * @param sdk - Initialized KeycloakClient instance
  * @param groupId - ID of the group to display
  */
-async function displayGroupStructure(sdk: KeycloakAdminSDK, groupId: string): Promise<void> {
+async function displayGroupStructure(sdk: KeycloakClient, groupId: string): Promise<void> {
   console.log(`Retrieving group structure for group with ID: ${groupId}`);
 
   try {
@@ -205,7 +205,7 @@ async function createGroupHierarchy() {
 
   try {
     // Initialize the Keycloak Admin SDK
-    const sdk = new KeycloakAdminSDK(config);
+    const sdk = new KeycloakClient(config);
     console.log(`Connected to Keycloak at ${config.baseUrl}`);
 
     // Create a top-level group

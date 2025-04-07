@@ -5,7 +5,7 @@
  * It follows SOLID principles and clean code practices.
  */
 
-import KeycloakAdminSDK from '../../index';
+import KeycloakClient from '../../index';
 import { ClientScopeMappingsApi } from './client-scope-mappings';
 import { ClientTemplateScopeMappingsApi } from './client-template-scope-mappings';
 import { clientIdScopeMappingsApi } from './client-id-scope-mappings';
@@ -16,14 +16,14 @@ import { clientIdScopeMappingsApi } from './client-id-scope-mappings';
  * Factory for creating scope mappings API instances for different resource types
  */
 export class ScopeMappingsApiFactory {
-  private sdk: KeycloakAdminSDK;
+  private sdk: KeycloakClient;
 
   /**
    * Constructor for ScopeMappingsApiFactory
    *
-   * @param sdk - KeycloakAdminSDK instance
+   * @param sdk - KeycloakClient instance
    */
-  constructor(sdk: KeycloakAdminSDK) {
+  constructor(sdk: KeycloakClient) {
     this.sdk = sdk;
   }
 

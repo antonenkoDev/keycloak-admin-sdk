@@ -13,7 +13,7 @@
 
 import { KeycloakConfig } from '../../src/types/auth';
 import { UserRepresentation } from '../../src/types/users';
-import KeycloakAdminSDK from '../../src';
+import KeycloakClient from '../../src';
 import dotenv from 'dotenv';
 
 // Load environment variables from .env file
@@ -46,7 +46,7 @@ async function getUserDetails(userId: string): Promise<UserRepresentation | null
 
   try {
     // Initialize the Keycloak Admin SDK
-    const sdk = new KeycloakAdminSDK(config);
+    const sdk = new KeycloakClient(config);
     console.log(`Connected to Keycloak at ${config.baseUrl}`);
 
     try {
@@ -106,7 +106,7 @@ async function main() {
   // 2. List users and get the first one
 
   try {
-    const sdk = new KeycloakAdminSDK(config);
+    const sdk = new KeycloakClient(config);
 
     // Option 1: Use a specific user ID if provided as an argument
     const providedUserId = process.argv[2];

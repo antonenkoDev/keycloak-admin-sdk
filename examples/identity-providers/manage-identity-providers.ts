@@ -12,7 +12,7 @@
  * Following SOLID principles and clean code practices.
  */
 
-import KeycloakAdminSDK from '../../src/index';
+import KeycloakClient from '../../src/index';
 import { IdentityProviderRepresentation } from '../../src/types/identity-providers';
 import { IdentityProviderMapperRepresentation } from '../../src/types/identity-provider-mappers';
 
@@ -36,7 +36,7 @@ async function main() {
   try {
     // Initialize the SDK
 
-    const sdk = new KeycloakAdminSDK(config);
+    const sdk = new KeycloakClient(config);
 
     // Get the OIDC provider factory details
 

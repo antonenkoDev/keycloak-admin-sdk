@@ -11,7 +11,7 @@
  */
 
 import { KeycloakConfig } from '../../src/types/auth';
-import KeycloakAdminSDK from '../../src';
+import KeycloakClient from '../../src';
 import { GroupRepresentation } from '../../src/types/groups';
 import dotenv from 'dotenv'; // Load environment variables from .env file
 
@@ -31,7 +31,7 @@ const config: KeycloakConfig = {
 };
 
 // Instantiate Keycloak SDK
-const sdk = new KeycloakAdminSDK(config);
+const sdk = new KeycloakClient(config);
 
 /**
  * Create a simple group hierarchy with a parent group and child groups
@@ -139,11 +139,11 @@ async function displayGroup(groupId: string): Promise<void> {
 /**
  * Display the complete group hierarchy with attributes
  *
- * @param sdk - Initialized KeycloakAdminSDK instance
+ * @param sdk - Initialized KeycloakClient instance
  * @param groupId - The ID of the top-level group to display
  * @returns Promise that resolves when the hierarchy has been displayed
  */
-async function displayGroupHierarchy(sdk: KeycloakAdminSDK, groupId: string): Promise<void> {
+async function displayGroupHierarchy(sdk: KeycloakClient, groupId: string): Promise<void> {
   if (!groupId) {
     console.error('Group ID is required to display hierarchy');
     return;

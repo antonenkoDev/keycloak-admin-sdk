@@ -1,4 +1,4 @@
-import KeycloakAdminSDK from '../../index';
+import KeycloakClient from '../../index';
 import {
   AdminEventRepresentation,
   ClientPoliciesRepresentation,
@@ -18,7 +18,7 @@ import {
  * API for managing Keycloak realms
  */
 export class RealmsApi {
-  constructor(private sdk: KeycloakAdminSDK) {}
+  constructor(private sdk: KeycloakClient) {}
 
   /**
    * Get accessible realms

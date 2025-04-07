@@ -8,8 +8,7 @@
  *
  * Following SOLID principles and clean code practices
  */
-
-import { KeycloakAdminSDK } from '../src'; // Load environment variables
+import KeycloakClient from '../src';
 
 // Load environment variables
 const baseUrl = process.env.KEYCLOAK_URL || 'http://localhost:8080';
@@ -26,13 +25,14 @@ async function demonstrateAttackDetection() {
 
   try {
     console.log('Initializing Keycloak Admin SDK...');
-    const sdk = new KeycloakAdminSDK({
+    const sdk = new KeycloakClient({
       baseUrl,
       realm,
-      clientId,
+      authMethod: 'password',
       credentials: {
         username,
-        password
+        password,
+        clientId
       }
     });
 
@@ -83,13 +83,14 @@ async function demonstrateAttackDetection() {
     // Clean up: Delete the test user
     if (userId) {
       try {
-        const sdk = new KeycloakAdminSDK({
+        const sdk = new KeycloakClient({
           baseUrl,
           realm,
-          clientId,
+          authMethod: 'password',
           credentials: {
             username,
-            password
+            password,
+            clientId
           }
         });
 

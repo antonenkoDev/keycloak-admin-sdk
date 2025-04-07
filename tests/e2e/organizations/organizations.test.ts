@@ -10,7 +10,7 @@
  * - Organization identity providers
  */
 
-import KeycloakAdminSDK from '../../../src/index';
+import KeycloakClient from '../../../src/index';
 import {
   OrganizationDomainRepresentation,
   OrganizationRepresentation
@@ -29,7 +29,7 @@ const TEST_TIMEOUT = 30000;
 
 describe('Organizations API E2E Tests', () => {
   let testContext: TestContext;
-  let sdk: KeycloakAdminSDK;
+  let sdk: KeycloakClient;
   let organizationId: string;
   let userId: string;
   let identityProviderAlias: string;

@@ -3,7 +3,7 @@
  * Provides methods for managing clients in Keycloak
  */
 
-import KeycloakAdminSDK from '../../index';
+import KeycloakClient from '../../index';
 import {
   ClientRepresentation,
   ClientScopeRepresentation,
@@ -21,7 +21,7 @@ import { ClientRoleMappingsApi } from './client-role-mappings/client-role-mappin
  * API for managing Keycloak clients
  */
 export class ClientsApi {
-  private sdk: KeycloakAdminSDK;
+  private sdk: KeycloakClient;
   /**
    * Client certificates API for managing client certificates
    */
@@ -50,9 +50,9 @@ export class ClientsApi {
   /**
    * Creates a new instance of the Clients API
    *
-   * @param {KeycloakAdminSDK} sdk - The Keycloak Admin SDK instance
+   * @param {KeycloakClient} sdk - The Keycloak Admin SDK instance
    */
-  constructor(sdk: KeycloakAdminSDK) {
+  constructor(sdk: KeycloakClient) {
     this.sdk = sdk;
 
     // Initialize all sub-APIs

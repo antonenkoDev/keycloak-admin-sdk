@@ -3,7 +3,7 @@
  * Focused on managing resource server configuration
  */
 
-import KeycloakAdminSDK from '../../index';
+import KeycloakClient from '../../index';
 import {
   ResourceRepresentation,
   ResourceRepresentationResponse,
@@ -19,14 +19,14 @@ import {
  * @see https://www.keycloak.org/docs/latest/authorization_services/#_resource_server
  */
 export class ResourceServerApi {
-  private sdk: KeycloakAdminSDK;
+  private sdk: KeycloakClient;
 
   /**
    * Creates a new instance of the Resource Server API
    *
-   * @param {KeycloakAdminSDK} sdk - The Keycloak Admin SDK instance
+   * @param {KeycloakClient} sdk - The Keycloak Admin SDK instance
    */
-  constructor(sdk: KeycloakAdminSDK) {
+  constructor(sdk: KeycloakClient) {
     this.sdk = sdk;
   }
 

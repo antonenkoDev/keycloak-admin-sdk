@@ -2,7 +2,7 @@
  * E2E tests for the Component API
  */
 import { afterAll, beforeAll, describe, expect, it } from '@jest/globals';
-import KeycloakAdminSDK from '../../../src';
+import KeycloakClient from '../../../src';
 import { cleanupTestEnvironment, setupTestEnvironment, TestContext } from '../utils/test-setup';
 import { ComponentRepresentation } from '../../../src/types/component';
 
@@ -10,7 +10,7 @@ const TEST_TIMEOUT = 30000;
 
 describe('Component API', () => {
   let testContext: TestContext;
-  let sdk: KeycloakAdminSDK;
+  let sdk: KeycloakClient;
   let realmName: string;
   let componentId: string;
 

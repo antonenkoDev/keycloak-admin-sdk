@@ -1,8 +1,8 @@
-import KeycloakAdminSDK from '../../index';
+import KeycloakClient from '../../index';
 import { GroupRepresentation } from '../../types/users';
 
 export class GroupsApi {
-  constructor(private sdk: KeycloakAdminSDK) {}
+  constructor(private sdk: KeycloakClient) {}
 
   /**
    * Get groups associated with the user.

@@ -6,7 +6,7 @@
  * Based on: https://www.keycloak.org/docs-api/latest/rest-api/index.html#_identity_providers
  */
 
-import KeycloakAdminSDK from '../../index';
+import KeycloakClient from '../../index';
 import { IdentityProviderRepresentation } from '../../types/identity-providers';
 import {
   IdentityProviderMapperRepresentation,
@@ -19,14 +19,14 @@ import {
  * Provides methods to manage identity providers in Keycloak
  */
 export class IdentityProvidersApi {
-  private sdk: KeycloakAdminSDK;
+  private sdk: KeycloakClient;
 
   /**
    * Constructor for IdentityProvidersApi
    *
-   * @param sdk - KeycloakAdminSDK instance
+   * @param sdk - KeycloakClient instance
    */
-  constructor(sdk: KeycloakAdminSDK) {
+  constructor(sdk: KeycloakClient) {
     this.sdk = sdk;
   }
 

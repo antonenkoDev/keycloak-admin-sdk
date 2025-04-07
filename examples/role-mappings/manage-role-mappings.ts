@@ -9,7 +9,7 @@
  * - Proper resource cleanup in all scenarios
  */
 
-import KeycloakAdminSDK from '../../src';
+import KeycloakClient from '../../src';
 import { KeycloakConfig } from '../../src/types/auth';
 import { RoleRepresentation } from '../../src/types/roles';
 import { UserRepresentation } from '../../src/types/users';
@@ -50,7 +50,7 @@ async function main() {
     console.log('Starting Role Mappings API example...');
 
     // Initialize the Keycloak Admin SDK
-    const sdk = new KeycloakAdminSDK(config);
+    const sdk = new KeycloakClient(config);
 
     // Step 1: Create test resources
     console.log('\nStep 1: Creating test resources');
@@ -406,7 +406,7 @@ async function main() {
 
     try {
       // Only attempt cleanup if we created resources
-      const sdk = new KeycloakAdminSDK(config);
+      const sdk = new KeycloakClient(config);
 
       if (testRole1 && testRole1.name) {
         // Delete test role 1

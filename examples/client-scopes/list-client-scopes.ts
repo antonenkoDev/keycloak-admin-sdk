@@ -5,7 +5,7 @@
  * using the Keycloak Admin SDK.
  */
 
-import KeycloakAdminSDK from '../../src/index';
+import KeycloakClient from '../../src/index';
 import { KeycloakConfig } from '../../src/types/auth';
 import dotenv from 'dotenv';
 
@@ -24,7 +24,7 @@ const config: KeycloakConfig = {
   }
 };
 
-const sdk = new KeycloakAdminSDK(config);
+const sdk = new KeycloakClient(config);
 
 /**
  * List all client scopes in the realm

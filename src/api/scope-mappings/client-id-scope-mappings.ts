@@ -5,7 +5,7 @@
  * It follows SOLID principles and clean code practices.
  */
 
-import KeycloakAdminSDK from '../../index';
+import KeycloakClient from '../../index';
 import { BaseScopeMappingsApi } from './scope-mappings';
 
 /**
@@ -19,10 +19,10 @@ export class clientIdScopeMappingsApi extends BaseScopeMappingsApi {
   /**
    * Constructor for clientIdScopeMappingsApi
    *
-   * @param sdk - KeycloakAdminSDK instance
+   * @param sdk - KeycloakClient instance
    * @param clientId - ID of the client
    */
-  constructor(sdk: KeycloakAdminSDK, clientId: string) {
+  constructor(sdk: KeycloakClient, clientId: string) {
     super(sdk);
 
     if (!clientId) {

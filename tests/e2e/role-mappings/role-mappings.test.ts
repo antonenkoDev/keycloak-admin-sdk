@@ -5,7 +5,7 @@
  * a running Keycloak server, following SOLID principles and clean code practices.
  */
 
-import KeycloakAdminSDK from '../../../src';
+import KeycloakClient from '../../../src';
 import { RoleRepresentation } from '../../../src/types/roles';
 import { UserRepresentation } from '../../../src/types/users';
 import { GroupRepresentation } from '../../../src/types/groups';
@@ -16,7 +16,7 @@ const TEST_TIMEOUT = 30000;
 
 describe('Role Mappings API E2E Tests', () => {
   let testContext: TestContext;
-  let sdk: KeycloakAdminSDK;
+  let sdk: KeycloakClient;
   let userId: string;
   let groupId: string;
   let role1Id: string;

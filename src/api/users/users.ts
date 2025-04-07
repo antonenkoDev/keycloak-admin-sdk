@@ -1,4 +1,4 @@
-import KeycloakAdminSDK from '../../index';
+import KeycloakClient from '../../index';
 import {
   CountUsersParams,
   ExecuteActionsEmailParams,
@@ -23,7 +23,7 @@ export class UsersApi {
   public groups: GroupsApi;
   private roleMappings: UserRoleMappingsApi;
 
-  constructor(private sdk: KeycloakAdminSDK) {
+  constructor(private sdk: KeycloakClient) {
     this.consents = new ConsentsApi(sdk);
     this.credentials = new CredentialsApi(sdk);
     this.groups = new GroupsApi(sdk);

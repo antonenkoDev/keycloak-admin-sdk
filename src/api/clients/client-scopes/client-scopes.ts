@@ -3,21 +3,21 @@
  * Provides methods for managing client scopes in Keycloak
  */
 
-import KeycloakAdminSDK from '../../../index';
+import KeycloakClient from '../../../index';
 import { ClientScopeRepresentation, ProtocolMapperRepresentation } from '../../../types/clients';
 
 /**
  * API for managing Keycloak client scopes
  */
 export class ClientScopesApi {
-  private sdk: KeycloakAdminSDK;
+  private sdk: KeycloakClient;
 
   /**
    * Creates a new instance of the Client Scopes API
    *
-   * @param {KeycloakAdminSDK} sdk - The Keycloak Admin SDK instance
+   * @param {KeycloakClient} sdk - The Keycloak Admin SDK instance
    */
-  constructor(sdk: KeycloakAdminSDK) {
+  constructor(sdk: KeycloakClient) {
     this.sdk = sdk;
   }
 

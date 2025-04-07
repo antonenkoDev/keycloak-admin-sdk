@@ -13,7 +13,7 @@
 
 import { UserRepresentation } from '../../src/types/users';
 import { KeycloakConfig } from '../../src/types/auth';
-import KeycloakAdminSDK from '../../src';
+import KeycloakClient from '../../src';
 import dotenv from 'dotenv';
 
 // Load environment variables from .env file
@@ -39,7 +39,7 @@ async function createUser() {
 
   try {
     // Initialize the Keycloak Admin SDK
-    const sdk = new KeycloakAdminSDK(config);
+    const sdk = new KeycloakClient(config);
     console.log(`Connected to Keycloak at ${config.baseUrl}`);
 
     // Create a unique username to avoid conflicts
